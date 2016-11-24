@@ -122,5 +122,9 @@ utils.assignPictureProfileUrl(idUsers, newList);
     }
 
     //Prueba 24/11/2016
+<<<<<<< HEAD
     //Comntario 2 Gabriel
+=======
+    //ROGELIO 24/11/2016
+>>>>>>> Rogelio
 }

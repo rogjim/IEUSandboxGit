@@ -814,5 +814,85 @@ public with sharing class Utils {
     	}
 		return letras;
     }
+
+    /*
+        RJP
+        24NOV16
+        Recupera el valor de la beca por usuario
+    */
+    public Decimal getMedidoresByPromotor(String idPropietario,String periodo, String tipo) {
+        Decimal beca = 0;
+        if(tipo == 'ASPIRANTES'){
+            Decimal becaLead = gerPorcentaje(idPropietario,periodo,'MedidorBecasLeadsInteresados');
+            Decimal becaOpp = gerPorcentaje(idPropietario,periodo,'MedidorBecasOportunidadesAspirates');
+            beca = becaLead + becaOpp;
+
+        }else if (tipo == 'INSCRITOS'){
+            beca = gerPorcentaje(idPropietario,periodo,'MedidorBecasOportunidadesGanadas');
+            
+        }
+        return beca;
+    }
+
+    public Decimal gerPorcentaje(String idPropietario,String periodo,String nombreInforme){
+        Decimal porcentaje = 0;
+         List <Report> reportList = [SELECT Id,DeveloperName FROM Report where 
+         DeveloperName =: nombreInforme];
+         String reportId = (String)reportList.get(0).get('Id');
+        
+        
+        Reports.ReportDescribeResult describe = Reports.ReportManager.describeReport(reportId);
+        Reports.ReportMetadata reportMedata = describe.getReportMetadata();
+        Reports.reportResults results = null;
+        
+        //reportMedata.getReportFilters()[2].setValue(periodo); //Es fijo e indica el indice del filtro correspondiende a Periodo
+        for(Reports.ReportFilter rf : reportMedata.getReportFilters()){
+            if(rf.getColumn().contains('Periodo')){
+                rf.setValue(periodo);
+            }
+        }
+        
+        boolean isFinish = false;
+        Reports.ReportInstance reportInstanceUno = Reports.ReportManager.runAsyncReport(reportId,reportMedata, true);
+               Id instanceId = reportInstanceUno.getId();
+        do{
+            Reports.ReportInstance reportInstance = Reports.ReportManager.getReportInstance(instanceId);
+            boolean reportIsRunning = reportInstance.getStatus() == 'Running' || reportInstance.getStatus() == 'New';
+            if (!reportIsRunning) {
+                results = reportInstance.getReportResults();
+                porcentaje = processResultBeca(results,idPropietario);
+                isFinish = true;
+            }
+        }while(!isFinish);
+            
+        return porcentaje;
+    }
+
+ public static Decimal processResultBeca(Reports.reportResults results, String idPropietario){
+        Decimal porcentaje = 0;
+        Reports.Dimension dim = results.getGroupingsDown();
+
+        for(integer indice = 0; indice < dim.getGroupings().size() ; indice ++){
+            
+            Reports.GroupingValue groupingVal = dim.getGroupings()[indice];
+            String idPropietarioInforme = String.valueOf(groupingVal.getValue());
+            if(idPropietarioInforme.contains(idPropietario)){
+                String factMapKey = groupingVal.getKey() + '!T';
+            
+                // Get the fact map from the report results
+                Reports.ReportFactWithDetails factDetails = (Reports.ReportFactWithDetails)results.getFactMap().get(factMapKey);
+            
+                // Get the first summary amount from the fact map
+                Reports.SummaryValue sumVal = factDetails.getAggregates()[0];
+                String letraSuma = String.valueOf(sumVal.getLabel());
+                letraSuma = letraSuma.replace(',','');
+                porcentaje = Decimal.valueOf(letraSuma);
+                break;
+
+            }
+            
+        }
+        return porcentaje;
+   }
    
 }
