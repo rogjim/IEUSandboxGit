@@ -123,4 +123,5 @@ utils.assignPictureProfileUrl(idUsers, newList);
 
     //Prueba 24/11/2016
     //ROGELIO 24/11/2016
+    //Comntario 2 Gabriel
 }
