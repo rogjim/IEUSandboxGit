@@ -120,4 +120,6 @@ utils.assignPictureProfileUrl(idUsers, newList);
         String paramVal='22';
         paramName=Utils.encodeQueryParam(  paramName, paramVal);
     }
+
+    //Prueba 24/11/2016
 }
