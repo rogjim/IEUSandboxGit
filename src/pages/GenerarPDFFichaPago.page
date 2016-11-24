@@ -1,0 +1,28 @@
+<!--apex:page standardController="FichaPago__c" action="{!sendMail}" extensions="GenerarPDFFichaPagoCtrl"-->
+<apex:page standardController="FichaPago__c" extensions="GenerarPDFFichaPagoCtrl">
+    <center>
+        
+        <apex:form >
+            <apex:actionFunction name="enviarMailFicha" action="{!sendMail}" reRender="mensaje"/>
+            <apex:pageBlock id="mensaje" >
+                <h2 id="tagOk">
+                    Se ha enviado la ficha de pago
+                </h2>
+                <br/><br/>
+                <button id="btnBack" onclick="history.back(-1);">Volver Atrás</button>
+            </apex:pageBlock>
+        </apex:form>
+    </center>
+    <script>
+    alerta();
+    function alerta(){          
+        if (confirm("¿Está seguro que desea enviar la ficha de pago") == true) {
+            enviarMailFicha();
+        } else {
+            document.getElementById("tagOk").innerHTML = "";
+            document.getElementById("btnBack").style.visibility = 'hidden';
+            window.location="/{!idToken.Id}";
+        }
+    }
+    </script>
+</apex:page>

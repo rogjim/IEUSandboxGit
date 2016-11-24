@@ -1,0 +1,201 @@
+<apex:page standardController="Descuento__c" extensions="DES_DescuentoIframeCtrl">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous">
+    </script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css"/>
+    <apex:includeScript value="{!URLFOR($Resource.JQuery,'jquery-2.2.2.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.JQuery,'jquery-ui.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.JQuery,'jquery.bootstrap-duallistbox.min.js')}" />
+    <script src="/soap/ajax/13.0/connection.js"></script>
+    <script type="text/javascript">if(typeof sforce !== 'undefined') {sforce.connection.sessionId = '{!GETSESSIONID()}';} var id='{!Descuento__c.Id}';  </script>
+    <div class="table-responsive col-md-offset-2 col-md-7">
+        <div id="overlay">
+            <div id="cargando-datos" style="left:48%; top:45%; z-index: 999; position: fixed;">
+                <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+            </div>
+        </div>
+        <table id="table-descuento" class="table table-striped tableAplicaPara">
+            <thead>
+                <tr>
+                    <th>Periodos</th>
+                    <th>Modalidades</th>
+                    <th>Niveles</th>
+                    <th id='thPlantel' class='hidden'>Plantel</th>
+                    <th id='thPrograma' class='hidden'>Programa</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <style>
+    	.tableAplicaPara thead{
+        	font-size:80%;
+        }
+        .tableAplicaPara tbody{
+        	font-size:88%;
+        }
+        .hidden{
+        	display: none!important;
+        }
+    </style>
+    <script type="text/javascript">
+    var elementosTabla={};
+    var todosPeriodos = {};
+    var todosModalidades = {};
+    var todosNiveles = {};
+    var todosPlanteles = {};
+    var todosProgramas = {};
+    /*BCA*/
+    var recuperadosBCA = {};
+    var periodosBCA = [];
+    var modalidadesBCA = [];
+    var nivelesBCA = [];
+    var plantelBCA = [];
+    var programaBCA = [];
+    var tipoDescuento = '{!Descuento__c.TipoDescuento__c}';
+    
+    j$ = jQuery.noConflict();
+    j$(document).ready(function() {
+        if(tipoDescuento=='Promoción 0'){
+        	j$('#thPlantel').removeClass('hidden');
+            j$('#thPrograma').removeClass('hidden');
+        }
+        /*********Periodo inicial y modalidad si seleecionar nivel*/
+        var query = 'SELECT Id, Name FROM Periodo__c WHERE Autorizado__c = true';
+        DES_DescuentoIframeCtrl.query(query, function(res, e){
+                if(res.length == '1') {                                      
+                    todosPeriodos[res[0].Id] = res[0].Name;
+                } else if(res.length > 0) {
+                    res.forEach(function(a, i){
+                        todosPeriodos[a.Id] = a.Name;
+                    });
+                }
+                count++;      
+        });
+        
+        var query = 'SELECT id, Name, TipoCatalogo__c FROM Catalogo__c WHERE TipoCatalogo__c = \'Modalidad\' OR TipoCatalogo__c = \'Nivel\'';
+        DES_DescuentoIframeCtrl.query(query, function(res, e){
+                if(res.length == '1') {
+                    dataPeriodo = res;
+                    todosModalidades[res[0].Id] = res[0].Name;
+                } else if(res.length > 0) {
+                    var dataMsP = res;
+                    dataMsP.forEach(function(a, i){
+                        if(a.TipoCatalogo__c == 'Modalidad'){
+                            todosModalidades[a.Id] = a.Name;
+                        }
+                        else if(a.TipoCatalogo__c == 'Nivel'){
+                            todosNiveles[a.Id] = a.Name;
+                        }
+                    });
+                }
+                count++;      
+        });
+        
+        /*********************/
+        if(!(id=='')){
+            query = 'SELECT Id, Periodo__c, Periodo__r.Name, Modalidad__c, Modalidad__r.Name, Nivel__c, Nivel__r.Name, Plantel__c, Plantel__r.Name, Programa__c, Programa__r.Name FROM BecaConvenioAsignacion__c WHERE Descuento__c =\''+ id + '\''; 
+            DES_DescuentoIframeCtrl.query(query, function(res, e){
+                if(res.length == '1') {
+                    periodosBCA[0] = res[0].Periodo__c == null ? 'Todos' : res[0].Periodo__c;
+                    modalidadesBCA[0] = res[0].Modalidad__c == null ? 'Todos' : res[0].Modalidad__c;
+                    nivelesBCA[0] = res[0].Nivel__c == null ? 'Todos' : res[0].Nivel__c;
+                    
+                    if(tipoDescuento=='Promoción 0'){
+                        plantelBCA[0] = res[0].Plantel__c == null ? 'Todos' : res[0].Plantel__c;
+                        programaBCA[0] = res[0].Programa__c == null ? 'Todos' : res[0].Programa__c;
+                        recuperadosBCA[res[0].Id] = periodosBCA[0]+''+modalidadesBCA[0]+''+nivelesBCA[0]+''+plantelBCA[0]+''+programaBCA[0];
+                    }else{
+                    	recuperadosBCA[res[0].Id] = periodosBCA[0]+''+modalidadesBCA[0]+''+nivelesBCA[0];
+                    }
+                } else if(res.length > 0) {
+                    res.forEach(function(a, i){
+                        periodosBCA[i] = a.Periodo__c == undefined || a.Periodo__c == null  ? 'Todos' : a.Periodo__c;
+                        modalidadesBCA[i] = a.Modalidad__c == undefined|| a.Modalidad__c == null ? 'Todos' : a.Modalidad__c;
+                        nivelesBCA[i] = a.Nivel__c ==undefined || a.Nivel__c == null ? 'Todos' : a.Nivel__c;
+                        if(tipoDescuento=='Promoción 0'){
+                            plantelBCA[i] = a.Plantel__c == undefined ? 'Todos' : a.Plantel__c;
+                            programaBCA[i] = a.Programa__c == undefined ? 'Todos' : a.Programa__c;
+                            recuperadosBCA[a.Id] = periodosBCA[i]+''+modalidadesBCA[i]+''+nivelesBCA[i]+''+plantelBCA[i]+''+programaBCA[i];
+                            //console.log(recuperadosBCA)
+                        }else{
+                            recuperadosBCA[a.Id] = periodosBCA[i]+''+modalidadesBCA[i]+''+nivelesBCA[i];
+                        }
+                        i++;
+                    });
+                }
+                count++;
+            });
+        }
+        /*********************/
+        
+        //Plantel y Programa 02/09/2016
+        var query = 'SELECT Periodo__c, Modalidad__c, Nivel__c, Plantel__c, Plantel__r.Name, Programa__c, Programa__r.Name FROM OfertaEducativa__c WHERE Periodo__r.Autorizado__c = true';
+        DES_DescuentoIframeCtrl.query(query, function(res, e){
+            if(res.length == '1') {
+                todosPlanteles[res[0].Plantel__c] = res[0].Plantel__r.Name;
+                todosProgramas[res[0].Programa__c] = res[0].Programa__r.Name;
+            } else if(res.length > 0) {                
+                res.forEach(function(a, i){
+                    todosPlanteles[a.Plantel__c] = a.Plantel__r.Name;
+                    todosProgramas[a.Programa__c] = a.Programa__r.Name;                        
+                });
+            }
+            count++;
+        });
+    });
+    
+    var myVar;
+    var count=0;
+    function myFunction() {
+        myVar = setInterval(loadContry, 1000);
+    }
+    myFunction();
+    function loadContry() {
+        if(count>=3){
+            completaTablaIdExistente();
+            j$('#overlay').addClass('hidden');
+            clearInterval(myVar);
+        }
+    }
+    
+    function completaTablaIdExistente() {
+        var keyElemento;
+        var i = 0;
+        if(Object.keys(recuperadosBCA).length>0){
+            for(key in recuperadosBCA){
+                if(tipoDescuento=='Promoción 0'){
+                    keyElemento = periodosBCA[i]+'|'+modalidadesBCA[i]+'|'+nivelesBCA[i]+'|'+plantelBCA[i]+'|'+programaBCA[i];
+                }else{
+                    keyElemento = periodosBCA[i]+'|'+modalidadesBCA[i]+'|'+nivelesBCA[i];
+                }
+                idtrInicial = recuperadosBCA[key];
+                elementosTabla[keyElemento] = true;
+                var nombreP = periodosBCA[i]=="" ? "Todos" : todosPeriodos[periodosBCA[i]];
+                var nombreM = modalidadesBCA[i]=="" ? "Todos" : todosModalidades[modalidadesBCA[i]];
+                var nombreN = nivelesBCA[i]=="" ? "Todos" : todosNiveles[nivelesBCA[i]];
+                var nombrePl = plantelBCA[i]=="" ? "<td> Todos </td>" : '<td>'+ todosPlanteles[plantelBCA[i]] +'</td>';
+                var nombrePr = programaBCA[1]=="" ? "<td> Todos </td>" : '<td>'+ todosProgramas[programaBCA[i]] +'</td>';
+                nombreP = nombreP!=undefined ? nombreP : "Todos";
+                nombreM = nombreM!=undefined ? nombreM : "Todos";
+                nombreN = nombreN!=undefined ? nombreN : "Todos";
+                
+                nombrePl = nombrePl!='<td>undefined</td>' ? nombrePl : "<td> Todos </td>";
+                nombrePr = nombrePr!='<td>undefined</td>'? nombrePr : "<td> Todos </td>";
+                if(tipoDescuento!='Promoción 0'){
+                	nombrePl = "";
+                	nombrePr = "";
+                }
+                j$('#table-descuento tbody').append(j$('<tr"><td>'+
+                                                       nombreP+'</td><td>'+
+                                                       nombreM+'</td><td>'+
+                                                       nombreN+'</td>'+
+                                                       nombrePl+
+                                                       nombrePr+'</tr>'));
+                i++;
+            }
+        }
+    }	
+    </script>
+</apex:page>

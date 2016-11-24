@@ -1,0 +1,45 @@
+29.0 APEX_CODE,FINEST;APEX_PROFILING,INFO;CALLOUT,INFO;DB,INFO;SYSTEM,DEBUG;VALIDATION,INFO;VISUALFORCE,INFO;WORKFLOW,INFO
+12:38:00.17 (17551088)|ENTERING_MANAGED_PKG|sf4twitter
+12:38:00.17 (17878211)|ENTERING_MANAGED_PKG|sf4twitter
+12:38:00.17 (18195393)|ENTERING_MANAGED_PKG|sf4twitter
+12:38:00.17 (18268830)|ENTERING_MANAGED_PKG|sf4twitter
+12:38:00.17 (18400964)|ENTERING_MANAGED_PKG|sf4twitter
+12:38:00.17 (18431599)|ENTERING_MANAGED_PKG|sf4twitter
+12:38:00.17 (18510926)|ENTERING_MANAGED_PKG|sf4twitter
+12:38:00.17 (20345848)|ENTERING_MANAGED_PKG|sf4twitter
+12:38:00.17 (24189059)|ENTERING_MANAGED_PKG|sf4twitter
+12:38:00.17 (26625928)|SOQL_EXECUTE_BEGIN|[9]|Aggregations:0|SELECT id, sf4twitter__Username__c FROM Twitter_Account__c 
+12:38:00.17 (30955336)|SOQL_EXECUTE_END|[9]|Rows:1
+12:38:00.17 (32026925)|ENTERING_MANAGED_PKG|sf4twitter
+12:38:00.17 (32097911)|ENTERING_MANAGED_PKG|sf4twitter
+12:38:00.58 (58471023)|CUMULATIVE_LIMIT_USAGE
+12:38:00.58 (58471023)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+12:38:00.58 (58471023)|LIMIT_USAGE_FOR_NS|sf4twitter|
+  Number of SOQL queries: 1 out of 100
+  Number of query rows: 1 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 1 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+12:38:00.58 (58471023)|CUMULATIVE_LIMIT_USAGE_END
+

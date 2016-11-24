@@ -1,0 +1,17 @@
+{
+    "projectName": "IEUSandbox",
+    "username": "ieu@ctconsulting.com.mx.sandbox",
+    "id": "68b9db20-b274-11e6-b0f0-53e341c41fe5",
+    "namespace": "",
+    "orgType": "developer",
+    "loginUrl": "https://login.salesforce.com/",
+    "instanceUrl": "https://cs2.salesforce.com",
+    "workspace": "/Users/rogeliojimenez/Documents/workspace/git",
+    "subscription": [
+        "ApexClass",
+        "ApexComponent",
+        "ApexPage",
+        "ApexTrigger",
+        "StaticResource"
+    ]
+}

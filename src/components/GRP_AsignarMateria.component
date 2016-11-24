@@ -1,0 +1,1354 @@
+<apex:component controller="OFE_OfertaEducativaCtrl">
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css"/>
+    <div id="assingProfessorCtrl" ng-controller="assingProfessorCtrl">
+        <br/>
+        
+        <div id="overlay" class="hidden" name="spin" styleClass="form-spin">
+            <div id="cargando-datos" style="left:48%; top:45%; z-index: 999; position: absolute;">
+                <i class="fa fa-spinner fa-spin"></i>
+                <br/><br/><span>Cargando...</span>
+            </div>
+        </div>
+        
+        <div class="panel panel-default ieu-panel">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-sm-9">
+                        <h3 class="panel-title">Asignar a periodo</h3>
+                    </div>
+                    <div class="col-sm-3 text-right" ng-if="base.periods.selected && base.periods.selected.groups">
+                        <label class="label label-primary" ng-bind="base.periods.selected.groups.length + ' grupo(s)'"></label>
+                    </div>
+                </div>
+            </div>
+            <form name="formEditDG">
+                <div class="panel-body">
+                    <div ng-if="base.loading" class="alert alert-success" role="alert">
+                        <i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
+                        <span ng-bind="base.messages.loading"/>
+                    </div>
+                    <div ng-if="!base.loading && base.periods.instances.length <= 0" class="alert alert-success" role="alert">
+                        <span class="fa-stack fa-lg">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-users fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <span ng-bind="base.messages.nodata"/>
+                    </div>
+                    <!--div class="form-horizontal" ng-if="!base.loading && base.groups.instances.length > 0"-->
+                    <div class="form-horizontal" ng-if="!base.loading && base.periods.instances.length > 0">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Periodo</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-change="listInstancesGroup(base.periods.selected)" ng-options="opt as opt.Name for opt in base.periods.instances" ng-model="base.periods.selected">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-2 text-right">
+                                <div class="input-group">
+                                    <span class="input-group-addon">Buscar</span>
+                                    <input type="text" class="form-control" ng-model="base.groups.pag.sea" id="idbuscar" />
+                                </div>
+                            </div>
+                            <div class="col-sm-3 form-horizontal">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-8">Elementos por página</label>
+                                    <div class="col-sm-4">
+                                        <select  id="idelem" class="form-control" ng-options="opt as opt for opt in base.groups.pag.psi" ng-model="base.groups.pag.ipp">
+                                            <option value="" selected="true">-- Ninguno --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" ng-model="base.groups.showHistory"/> Mostrar asignados
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-2 text-center" ng-if="base.groups.filtered.length > 0">
+                                <button ng-disabled="base.groups.saving" class="btn btn-success" ng-click="saveChanges()">
+                                    <span class="fa fa-save fa-fw" />
+                                    <span class="fa fa-spinner fa-pulse" ng-if="base.groups.saving"></span>
+                                    Guardar cambios
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row" >
+                            <div class="col-sm-6 col-sm-offset-6 text-right" ng-if="base.errors.length>0">
+                                <div class="alert alert-danger alert-dismissible fade in">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <ul class="list-unstyled">
+                                        <li ng-repeat="err in base.errors"><span ng-bind="err"/></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-sm-offset-6 text-right" ng-if="base.success.length>0">
+                                <div class="alert alert-success alert-dismissible fade in">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <ul class="list-unstyled">
+                                        <li ng-repeat="msg in base.success"><span ng-bind="msg"/></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-18">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr><th colspan="5" class="text-center">Oferta educativa</th><th colspan="17" class="text-center">Grupo</th></tr>
+                                            <tr>
+                                                <th> 
+                                                    <a ng-click="setFieldSort('Periodo__c')" class="ctc-btn"> 
+                                                        <span ng-class="iconSort('Periodo__c')"/>
+                                                        <span ng-bind="base.obj.Grupo__c.k.Periodo__c.label"/>
+                                                    </a>
+                                                </th>
+                                                <th> 
+                                                    <a ng-click="setFieldSort('Modalidad__c')" class="ctc-btn"> 
+                                                        <span ng-class="iconSort('Modalidad__c')"/>
+                                                        <span ng-bind="base.obj.OfertaEducativa__c.k.Modalidad__c.label"/>
+                                                    </a>
+                                                </th>
+                                                <th> 
+                                                    <a ng-click="setFieldSort('Plantel__c')" class="ctc-btn"> 
+                                                        <span ng-class="iconSort('Plantel__c')"/>
+                                                        <span ng-bind="base.obj.OfertaEducativa__c.k.Plantel__c.label"/>
+                                                    </a>
+                                                </th>
+                                                <th> 
+                                                    <a ng-click="setFieldSort('Nivel__c')" class="ctc-btn"> 
+                                                        <span ng-class="iconSort('Nivel__c')"/>
+                                                        <span ng-bind="base.obj.OfertaEducativa__c.k.Nivel__c.label"/>
+                                                    </a>
+                                                </th>
+                                                <th> 
+                                                    <a ng-click="setFieldSort('Programa__c')" class="ctc-btn"> 
+                                                        <span ng-class="iconSort('Programa__c')"/>
+                                                        <span ng-bind="base.obj.OfertaEducativa__c.k.Programa__c.label"/>
+                                                    </a>
+                                                </th>
+                                                
+                                                
+                                                <th> 
+                                                    <a ng-click="setFieldSort('Name')" class="ctc-btn"> 
+                                                        <span ng-class="iconSort('Name')"/>
+                                                        <span ng-bind="base.obj.Grupo__c.k.Name.label"/>
+                                                    </a>
+                                                </th>
+                                                <th> 
+                                                    <a ng-click="setFieldSort('Cupo__c')" class="ctc-btn"> 
+                                                        <span ng-class="iconSort('Cupo__c')"/>
+                                                        <span ng-bind="base.obj.Grupo__c.k.Cupo__c.label"/>
+                                                    </a>
+                                                </th>
+                                                <th> 
+                                                    <a ng-click="setFieldSort('Inscritos__c')" class="ctc-btn"> 
+                                                        <span ng-class="iconSort('Inscritos__c')"/>
+                                                        <span ng-bind="base.obj.Grupo__c.k.Inscritos__c.label"/>
+                                                    </a>
+                                                </th>
+                                                <th> 
+                                                    <a ng-click="setFieldSort('Validados__c')" class="ctc-btn"> 
+                                                        <span ng-class="iconSort('Validados__c')"/>
+                                                        <span ng-bind="base.obj.Grupo__c.k.Validados__c.label"/>
+                                                    </a>
+                                                </th>
+                                                <!-- <th ng-bind="base.obj.Grupo__c.k.Montaje__c.label"></th>-->
+                                               
+                                                <!--  <th ng-bind="base.obj.Grupo__c.k.CupoAcademico__c.label"></th>-->
+                                                <th style="width:40%" ng-bind="base.obj.Grupo__c.k.Docente__c.label"></th>
+                                                <th style="width:40%" ng-bind="base.obj.Grupo__c.k.Materia__c.label"></th>
+                                                 <th style="width:40%" ng-bind="base.obj.Grupo__c.k.AulaAcademico1__c.label"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="gp in base.groups.filtered|orderBy:base.groups.pag.sfi:base.groups.pag.rev|filter:base.groups.pag.sea|startFrom:(base.groups.pag.cpa - 1) * base.groups.pag.ipp|limitTo: base.groups.pag.ipp">
+                                                <td ng-bind="base.periods.selected.Name"></td>
+                                                <td ng-bind="gp.Modalidad__c"></td>
+                                                <td ng-bind="gp.Plantel__c"></td>
+                                                <td ng-bind="gp.Nivel__c"></td>
+                                                <td ng-bind="gp.Programa__c"></td>
+                                                <td ng-bind="gp.Name"></td>
+                                                <td ng-bind="gp.Cupo__c"></td>
+                                                <td ng-bind="gp.Inscritos__c"></td>
+                                                <td ng-bind="gp.Validados__c"></td>
+
+                                            <!--    <td>
+                                                    <ctc-input ctc-form="formEditDG" ctc-field="base.obj.Grupo__c.k.AulaAcademico__c" ctc-opts="base.aulas[gp.Plantel__c__i]" ctc-label="'Name'" ctc-instance="gp">
+                                                    </ctc-input>
+                                                </td>-->
+                                                
+                                                <td>
+                                                    <ctc-auto-complete 
+                                                                       ctc-instance="gp"
+                                                                       ctc-term="gp.Docente__c__t"
+                                                                       ctc-field="base.obj.Grupo__c.k.Docente__c"
+                                                                       ctc-form="formEditDG"
+                                                                       ctc-fields="['Name']"
+                                                                       ></ctc-auto-complete>
+                                                </td>
+                                                <td>
+                                                    <ctc-auto-complete 
+                                                                       ctc-instance="gp"
+                                                                       ctc-term="gp.Materia__c__t"
+                                                                       ctc-field="base.obj.Grupo__c.k.Materia__c"
+                                                                       ctc-form="formEditDG"
+                                                                       ctc-fields="['Name']"
+                                                                       ></ctc-auto-complete>
+                                                </td>
+                                                <td>
+                                                    <div class="col-sm-30">
+                                                        <input   size="30" name="numero" ng-model="gp.AulaAcademico1__c"  ng-required="false" ng-maxlength="16" class="form-control {{gp.AulaAcademico1__c}}" ng-touched ="gp.AulaAcademico1__c"/>
+                                                    </div>
+                                                </td> 
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <uib-pagination 
+                                                ng-if="base.groups.filtered.length > base.groups.pag.ipp"
+                                                items-per-page="base.groups.pag.ipp" 
+                                                total-items="base.groups.pag.tit" 
+                                                ng-model="base.groups.pag.cpa" 
+                                                max-size="base.groups.pag.mpa" 
+                                                boundary-links="true" 
+                                                force-ellipses="true" 
+                                                first-text="{{base.groups.pag.fir}}" 
+                                                previous-text="{{base.groups.pag.pre}}" 
+                                                next-text="{{base.groups.pag.next}}" 
+                                                last-text="{{base.groups.pag.last}}"
+                                                >
+                                </uib-pagination>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+    
+    
+    var app = angular.module('appIEU');
+    app.controller('assingProfessorCtrl', ['$scope', '$interval', '$filter', 'sfUtils', 'ctcUtils', 'filterFilter', function($scope, $interval, $filter, sfUtils, ctcUtils, filterFilter) {
+        //console.log('\n\n in assingProfessorCtrl ... ');
+        $scope.base = {
+            describe: ['Grupo__c', 'OfertaEducativa__c'],
+            obj: {},
+            groups: {
+                instances: [],
+                get: 'SELECT Id, Name, Montaje__c, AulaAcademico1__c, CupoAcademico__c,Estatus__c, Docente__c, Docente__r.Name, Materia__c, Materia__r.Name, Activo__c, AulaAsignada__c, Turno__c, HoraEntrada__c, HoraSalida__c, Dia__c, FechaApertura__c, FechaInicioClases__c, CondicionanteGrupo__c, Cupo__c, Sede__c, Periodicidad__c, Inscritos__c, Validados__c, OfertaEducativa__r.Id, OfertaEducativa__r.GrupoConfigurado__c, OfertaEducativa__r.PagoConfigurado__c, OfertaEducativa__r.Modalidad__r.Name, OfertaEducativa__r.Plantel__r.Id, OfertaEducativa__r.Plantel__r.Name, OfertaEducativa__r.Nivel__r.Name, OfertaEducativa__r.Programa__r.Id, OfertaEducativa__r.Programa__r.Name, OfertaEducativa__r.Periodo__c, Periodo__c, OfertaEducativa__r.Periodo__r.Id, (SELECT Id, OfertaEducativa__c, Grupo__c, Account.Name, Account.PersonEmail FROM Oportunidades__r), (SELECT Id, Name, Email, OfertaEducativa__c, GrupoAsignado__c FROM GrupoAsingado__r) FROM Grupo__c WHERE Estatus__c =\'Planeado\' AND OfertaEducativa__r.GrupoConfigurado__c=true AND OfertaEducativa__r.PagoConfigurado__c=true',
+                pag: { //pagination
+                ipp: 10,  //items per page
+                mpa: 5, //max pages
+                tit: 0,  //total items
+                cpa: 1, //current page
+                tpa: 0, //total pages
+                fir: 'Primero', // first
+                pre: 'Ant', // previous
+                next: 'Sig',
+                last: 'Último',
+                psi : [5, 10, 15, 20, 25, 50, 100], //page sizes
+                sfi: 'EstatusBeca__c', //sort field
+                rev: false, //reverse
+                sea: ''//search
+            },
+            saving: false,
+            showHistory: false
+        },
+            periods: {
+                instances: [],
+                    get: 'SELECT Id, Name FROM Periodo__c WHERE Activo__c=\'Activo\'',
+                        selected: {},
+            },
+            loading: true,
+            messages: {
+                        loading: 'Cargando...',
+                            nodata: 'No hay grupos para asignar catedrático y primer materia'
+                    },
+            error: [],
+            success:[],
+            Timer: null,
+            close: true,
+            delay: 300,
+            delayClose: 8000,
+            aulas: {}
+    };
+                                           //describe the objectes defined in $scope.base.describe
+                                           $scope.describeObjects = function(objs) {
+                                           	if(objs && objs !== null) {
+                                           		ctcUtils.describe(objs, function(err, result) {
+                                           			if(err) {
+                                           				$scope.errors = err;
+                                           			} else {
+                                           				//console.log('\n\n in result describe...');
+                                           				//console.log(result);
+                                           				angular.forEach($scope.base.describe, function(v, k) {
+                                           					if(result.hasOwnProperty(v))  {
+                                           						$scope.base.obj[v] = {};
+                   												$scope.base.obj[v].a = [];
+                   												$scope.base.obj[v].a = result[v];
+                   												$scope.base.obj[v].k = {};
+                   												angular.forEach(result[v], function(f, i) {
+        															$scope.base.obj[v].k[f.name] = f;
+    															});
+    														}
+    													});
+    													//setear a tipo percent
+    													$scope.base.obj.Grupo__c.k.CupoAcademico__c.type = 'percent';
+    												    //$scope.listInstancesGroup();
+    													$scope.listPeriods();
+    												}
+    											});
+    											
+    										}
+    									};
+    var nuevoIds='';
+    var  contador =0;
+    
+    
+    $scope.listPeriods = function() {
+        if($scope.base.periods && $scope.base.periods.selected) {
+            $scope.base.periods.selected.groups = [];
+        }
+        var query = 'SELECT OfertaEducativa__r.Periodo__r.Id, OfertaEducativa__r.Periodo__r.Name, OfertaEducativa__r.Periodo__r.FechaInicioReal__c FROM Grupo__c WHERE (Estatus__c =\'Autorizado\' OR Estatus__c =\'Planeado\') AND OfertaEducativa__r.Periodo__r.Id!=null GROUP BY OfertaEducativa__r.Periodo__r.Id, OfertaEducativa__r.Periodo__r.Name, OfertaEducativa__r.Periodo__r.FechaInicioReal__c ORDER BY OfertaEducativa__r.Periodo__r.FechaInicioReal__c DESC';
+        OFE_OfertaEducativaCtrl.query(query, function(periods) {
+            //console.log('result periods: ', periods);
+            $scope.base.periods.instances = periods;
+            //$scope.$apply();
+            $scope.listInstancesGroup($scope.base.periods.instances[0]);
+            $scope.$apply();
+        });
+    };
+    
+    $scope.listInstancesGroup = function(period) {	
+        //console.log('in listInstancesGroup..');
+        period.groups = [];
+        $scope.base.groups.filtered = [];
+        $scope.base.groups.loading = true;
+        if(period && period.Id) {
+            OFE_OfertaEducativaCtrl.query($scope.base.groups.get + ' AND OfertaEducativa__r.Periodo__r.Id=\'' + period.Id + '\'', function(res) {
+                //console.log('\n response listInstancesGroup historicalCtrl...', res);
+                period.groups = res || [];
+                var periods = {};
+                var planteles = {};
+                angular.forEach(period.groups, function(v, key) {
+                	planteles[v.OfertaEducativa__r.Plantel__c] = true;
+                        if(!periods[v.OfertaEducativa__r.Periodo__c]) {
+                            periods[v.OfertaEducativa__r.Periodo__c] = {Id: v.OfertaEducativa__r.Periodo__c, Name: v.Periodo__c, groups: []};
+                        }
+                        if(v.Estatus__c && v.Estatus__c.length > 0) {
+                            var Estatus__c = sfUtils.findElement('value', v.Estatus__c, $scope.base.obj.Grupo__c.k.Estatus__c.values);
+                            if(Estatus__c && Estatus__c.value) {
+                                v.Estatus__c__o = Estatus__c;
+                            }
+                        }
+                        if(v.Turno__c && v.Turno__c.length > 0) {
+                            var Turno__c = sfUtils.findElement('value', v.Turno__c, $scope.base.obj.Grupo__c.k.Turno__c.values);
+                            if(Turno__c && Turno__c.value) {
+                                v.Turno__c__o = Turno__c;
+                            }
+                        }
+                        if(v.HoraEntrada__c && v.HoraEntrada__c.length > 0) {
+                            var HoraEntrada__c = sfUtils.findElement('value', v.HoraEntrada__c, $scope.base.obj.Grupo__c.k.HoraEntrada__c.values);
+                            if(HoraEntrada__c && HoraEntrada__c.value) {
+                                v.HoraEntrada__c__o = HoraEntrada__c;
+                            }
+                        }
+                        if(v.HoraSalida__c && v.HoraSalida__c.length > 0) {
+                            var HoraSalida__c = sfUtils.findElement('value', v.HoraSalida__c, $scope.base.obj.Grupo__c.k.HoraSalida__c.values);
+                            if(HoraSalida__c && HoraSalida__c.value) {
+                                v.HoraSalida__c__o = HoraSalida__c;
+                            }
+                        }
+                        
+                        if(v.GrupoAsingado__r && v.GrupoAsingado__r != null) {
+                            if(v.GrupoAsingado__r.size === '1') {
+                                var temp = angular.copy(v.GrupoAsingado__r.records);
+                                v.GrupoAsingado__r = [];
+                                v.GrupoAsingado__r.push(temp);
+                            } else {
+                                v.GrupoAsingado__r = angular.copy(v.GrupoAsingado__r.records);
+                            }
+                        }
+                        if(v.Oportunidades__r && v.Oportunidades__r != null) {
+                            if(v.Oportunidades__r.size === '1') {
+                                var temp = angular.copy(v.Oportunidades__r.records);
+                                v.Oportunidades__r = [];
+                                v.Oportunidades__r.push(temp);
+                            } else {
+                                v.Oportunidades__r = angular.copy(v.Oportunidades__r.records);
+                            }
+                        }
+                        
+                        if(v.Montaje__c && v.Montaje__c.length > 0) {
+                            var Montaje__c = sfUtils.findElement('value', v.Montaje__c, $scope.base.obj.Grupo__c.k.Montaje__c.values);
+                            if(Montaje__c && Montaje__c.value) {
+                                v.Montaje__c__o = Montaje__c;
+                            }
+                        }                   
+               });
+                
+                //Obtener aulas de todos planteles
+                if(Object.keys(planteles).length > 0) {//Agrega validación calvarez 24 nov 2016
+                    $scope.getAulas(planteles);
+                }
+                var myvar;
+                
+                function ajusta(){
+                    document.getElementById("idbuscar").focus();
+                    document.getElementById("idelem").focus();
+                }
+                function mifuncion(){
+                    myvar=setInterval(prueba , 1000);
+                    $scope.$apply();
+                }
+                    
+                mifuncion();
+                function prueba(){
+                    if(contador>0){
+                        angular.forEach(period.groups, function(v, key) {
+                            planteles[v.OfertaEducativa__r.Plantel__c] = true;
+                            if(!periods[v.OfertaEducativa__r.Periodo__c]) {
+                                periods[v.OfertaEducativa__r.Periodo__c] = {Id: v.OfertaEducativa__r.Periodo__c, Name: v.Periodo__c, groups: []};
+                            }
+                            if(v.Estatus__c && v.Estatus__c.length > 0) {
+                                var Estatus__c = sfUtils.findElement('value', v.Estatus__c, $scope.base.obj.Grupo__c.k.Estatus__c.values);
+                                if(Estatus__c && Estatus__c.value) {
+                                    v.Estatus__c__o = Estatus__c;
+                                }
+                            }
+                            if(v.Turno__c && v.Turno__c.length > 0) {
+                                var Turno__c = sfUtils.findElement('value', v.Turno__c, $scope.base.obj.Grupo__c.k.Turno__c.values);
+                                if(Turno__c && Turno__c.value) {
+                                    v.Turno__c__o = Turno__c;
+                                }
+                            }
+                            if(v.HoraEntrada__c && v.HoraEntrada__c.length > 0) {
+                                var HoraEntrada__c = sfUtils.findElement('value', v.HoraEntrada__c, $scope.base.obj.Grupo__c.k.HoraEntrada__c.values);
+                                if(HoraEntrada__c && HoraEntrada__c.value) {
+                                    v.HoraEntrada__c__o = HoraEntrada__c;
+                                }
+                            }
+                            if(v.HoraSalida__c && v.HoraSalida__c.length > 0) {
+                                var HoraSalida__c = sfUtils.findElement('value', v.HoraSalida__c, $scope.base.obj.Grupo__c.k.HoraSalida__c.values);
+                                if(HoraSalida__c && HoraSalida__c.value) {
+                                    v.HoraSalida__c__o = HoraSalida__c;
+                                }
+                            }
+                            
+                            if(v.GrupoAsingado__r && v.GrupoAsingado__r != null) {
+                                if(v.GrupoAsingado__r.size === '1') {
+                                    var temp = angular.copy(v.GrupoAsingado__r.records);
+                                    v.GrupoAsingado__r = [];
+                                    v.GrupoAsingado__r.push(temp);
+                                } else {
+                                    v.GrupoAsingado__r = angular.copy(v.GrupoAsingado__r.records);
+                                }
+                            }
+                            if(v.Oportunidades__r && v.Oportunidades__r != null) {
+                                if(v.Oportunidades__r.size === '1') {
+                                    var temp = angular.copy(v.Oportunidades__r.records);
+                                    v.Oportunidades__r = [];
+                                    v.Oportunidades__r.push(temp);
+                                } else {
+                                    v.Oportunidades__r = angular.copy(v.Oportunidades__r.records);
+                                }
+                            }
+                            
+                            if(v.Montaje__c && v.Montaje__c.length > 0) {
+                                var Montaje__c = sfUtils.findElement('value', v.Montaje__c, $scope.base.obj.Grupo__c.k.Montaje__c.values);
+                                if(Montaje__c && Montaje__c.value) {
+                                    v.Montaje__c__o = Montaje__c;
+                                }
+                            }
+                            
+                            // console.log('AulaAcademico1__c --> '+ v.AulaAcademico1__c);
+                            
+                            if(v.AulaAcademico1__c && v.AulaAcademico1__c.length > 0) {
+                                var AulaAcademico1__c = sfUtils.findElement('value', v.AulaAcademico1__c, $scope.base.obj.Grupo__c.k.AulaAcademico1__c.values);
+                                console.log('aula --> '+ AulaAcademico1__c);
+                                if(AulaAcademico1__c  && AulaAcademico1__c.value ) {
+                                    v.AulaAcademico1__c__o = AulaAcademico1__c;
+                                }
+                            }
+                            v.Id= v.Id, 
+                            v.Name= v.Name, 
+                            v.Estatus__c= v.Estatus__c,
+                            v.Estatus__c__o= v.Estatus__c__o,
+                            v.AulaAsignada__c= v.AulaAsignada__c,
+                            v.Turno__c= v.Turno__c,
+                            v.Turno__c__o = v.Turno__c__o,
+                            v.HoraEntrada__c= v.HoraEntrada__c,
+                            v.HoraEntrada__c__o= v.HoraEntrada__c__o,
+                            v.HoraSalida__c= v.HoraSalida__c,
+                            v.HoraSalida__c__o= v.HoraSalida__c__o,
+                            v.Dia__c= v.Dia__c,
+                            v.FechaApertura__c= v.FechaApertura__c,
+                            v.FechaInicioClases__c= v.FechaInicioClases__c,
+                            v.CondicionanteGrupo__c= parseInt(v.CondicionanteGrupo__c),
+                            v.Sede__c= v.Sede__c,
+                            v.Periodicidad__c= v.Periodicidad__c,
+                            v.Activo__c= v.Activo__c,
+                            v.Cupo__c= v.Cupo__c != null ? parseInt(v.Cupo__c) : '',
+                            v.Inscritos__c= v.Inscritos__c != null ? parseInt(v.Inscritos__c) : '',
+                            v.Validados__c= v.Validados__c != null ? parseInt(v.Validados__c): '',
+                            v.OfertaEducativa__c= v.OfertaEducativa__r.Id, 
+                            v.Modalidad__c= v.OfertaEducativa__r.Modalidad__r.Name,
+                            v.Plantel__c= v.OfertaEducativa__r.Plantel__r.Name,
+                            v.Plantel__c__i= v.OfertaEducativa__r.Plantel__r.Id,
+                            v.Nivel__c= v.OfertaEducativa__r.Nivel__r.Name,
+                            v.Programa__c= v.OfertaEducativa__r.Programa__r.Name,
+                            v.Programa__c__i= v.OfertaEducativa__r.Programa__r.Id,
+                            v.GrupoAsingado__r = v.GrupoAsingado__r || [],
+                            v.Oportunidades__r= v.Oportunidades__r || [],
+                            v.Docente__c= v.Docente__c,
+                            v.Docente__c__t= v.Docente__r != null ? v.Docente__r.Name : '',
+                            v.Materia__c= v.Materia__c,
+                            v.Materia__c__t= v.Materia__r != null ? v.Materia__r.Name : '',                               
+                            v.Montaje__c= v.Montaje__c,
+                            v.Montaje__c__o= v.Montaje__c__o,                                        
+                            v.AulaAcademico1__c= v.AulaAcademico1__c,
+                            v.AulaAcademico1__c__o= v.AulaAcademico1__c__o
+                                    
+                        });
+
+                        $scope.$apply()//Agrega calvarez - 24 nov 2016
+                        clearInterval(myvar);
+                    }
+                    ajusta();
+                }
+                                //});
+                $scope.base.periods.selected = period;
+                $scope.base.loading = false;
+                $scope.base.groups.loading = false;
+                $scope.$apply();
+            });
+        }
+    };
+    $scope.describeObjects($scope.base.describe);
+    /*
+    $scope.listInstancesGroup = function(period) {	
+        if($scope.base && $scope.base.groups && $scope.base.groups.get && $scope.base.groups.get.length > 0) {
+            ctcUtils.retrieve($scope.base.groups.get, function(err, res) {
+                
+                if(err) {
+                    $scope.errors = err;
+                } else {
+                    $scope.base.groups.instances = res || [];
+                    if(!angular.isArray($scope.base.groups.instances)) {
+                        $scope.base.groups.instances = [];
+                    } else {
+                        var periods = {};
+                        var planteles = {};
+                        angular.forEach($scope.base.groups.instances, function(v, key) {
+                            planteles[v.OfertaEducativa__r.Plantel__c] = true;
+                            if(!periods[v.OfertaEducativa__r.Periodo__c]) {
+                                periods[v.OfertaEducativa__r.Periodo__c] = {Id: v.OfertaEducativa__r.Periodo__c, Name: v.Periodo__c, groups: []};
+                            }
+                            if(v.Estatus__c && v.Estatus__c.length > 0) {
+                                var Estatus__c = sfUtils.findElement('value', v.Estatus__c, $scope.base.obj.Grupo__c.k.Estatus__c.values);
+                                if(Estatus__c && Estatus__c.value) {
+                                    v.Estatus__c__o = Estatus__c;
+                                }
+                            }
+                            if(v.Turno__c && v.Turno__c.length > 0) {
+                                var Turno__c = sfUtils.findElement('value', v.Turno__c, $scope.base.obj.Grupo__c.k.Turno__c.values);
+                                if(Turno__c && Turno__c.value) {
+                                    v.Turno__c__o = Turno__c;
+                                }
+                            }
+                            if(v.HoraEntrada__c && v.HoraEntrada__c.length > 0) {
+                                var HoraEntrada__c = sfUtils.findElement('value', v.HoraEntrada__c, $scope.base.obj.Grupo__c.k.HoraEntrada__c.values);
+                                if(HoraEntrada__c && HoraEntrada__c.value) {
+                                    v.HoraEntrada__c__o = HoraEntrada__c;
+                                }
+                            }
+                            if(v.HoraSalida__c && v.HoraSalida__c.length > 0) {
+                                var HoraSalida__c = sfUtils.findElement('value', v.HoraSalida__c, $scope.base.obj.Grupo__c.k.HoraSalida__c.values);
+                                if(HoraSalida__c && HoraSalida__c.value) {
+                                    v.HoraSalida__c__o = HoraSalida__c;
+                                }
+                            }
+                            
+                            if(v.GrupoAsingado__r && v.GrupoAsingado__r != null) {
+                                if(v.GrupoAsingado__r.size === '1') {
+                                    var temp = angular.copy(v.GrupoAsingado__r.records);
+                                    v.GrupoAsingado__r = [];
+                                    v.GrupoAsingado__r.push(temp);
+                                } else {
+                                    v.GrupoAsingado__r = angular.copy(v.GrupoAsingado__r.records);
+                                }
+                            }
+                            if(v.Oportunidades__r && v.Oportunidades__r != null) {
+                                if(v.Oportunidades__r.size === '1') {
+                                    var temp = angular.copy(v.Oportunidades__r.records);
+                                    v.Oportunidades__r = [];
+                                    v.Oportunidades__r.push(temp);
+                                } else {
+                                    v.Oportunidades__r = angular.copy(v.Oportunidades__r.records);
+                                }
+                            }
+                            
+                            if(v.Montaje__c && v.Montaje__c.length > 0) {
+                                var Montaje__c = sfUtils.findElement('value', v.Montaje__c, $scope.base.obj.Grupo__c.k.Montaje__c.values);
+                                if(Montaje__c && Montaje__c.value) {
+                                    v.Montaje__c__o = Montaje__c;
+                                }
+                            }
+                        });
+                        
+                        //Obtener aulas de todos planteles
+                        $scope.getAulas(planteles);
+                        var myvar;
+                        
+                        function ajusta(){
+                            document.getElementById("idbuscar").focus();
+                            document.getElementById("idelem").focus();
+                        }
+                        function mifuncion(){
+                            myvar=setInterval(prueba , 1000);
+                        }
+                        
+                        
+                        mifuncion();
+                        function prueba(){
+                            if(contador>0){
+                                angular.forEach($scope.base.groups.instances, function(v, key) {
+                                    planteles[v.OfertaEducativa__r.Plantel__c] = true;
+                                    if(!periods[v.OfertaEducativa__r.Periodo__c]) {
+                                        periods[v.OfertaEducativa__r.Periodo__c] = {Id: v.OfertaEducativa__r.Periodo__c, Name: v.Periodo__c, groups: []};
+                                    }
+                                    if(v.Estatus__c && v.Estatus__c.length > 0) {
+                                        var Estatus__c = sfUtils.findElement('value', v.Estatus__c, $scope.base.obj.Grupo__c.k.Estatus__c.values);
+                                        if(Estatus__c && Estatus__c.value) {
+                                            v.Estatus__c__o = Estatus__c;
+                                        }
+                                    }
+                                    if(v.Turno__c && v.Turno__c.length > 0) {
+                                        var Turno__c = sfUtils.findElement('value', v.Turno__c, $scope.base.obj.Grupo__c.k.Turno__c.values);
+                                        if(Turno__c && Turno__c.value) {
+                                            v.Turno__c__o = Turno__c;
+                                        }
+                                    }
+                                    if(v.HoraEntrada__c && v.HoraEntrada__c.length > 0) {
+                                        var HoraEntrada__c = sfUtils.findElement('value', v.HoraEntrada__c, $scope.base.obj.Grupo__c.k.HoraEntrada__c.values);
+                                        if(HoraEntrada__c && HoraEntrada__c.value) {
+                                            v.HoraEntrada__c__o = HoraEntrada__c;
+                                        }
+                                    }
+                                    if(v.HoraSalida__c && v.HoraSalida__c.length > 0) {
+                                        var HoraSalida__c = sfUtils.findElement('value', v.HoraSalida__c, $scope.base.obj.Grupo__c.k.HoraSalida__c.values);
+                                        if(HoraSalida__c && HoraSalida__c.value) {
+                                            v.HoraSalida__c__o = HoraSalida__c;
+                                        }
+                                    }
+                                    
+                                    if(v.GrupoAsingado__r && v.GrupoAsingado__r != null) {
+                                        if(v.GrupoAsingado__r.size === '1') {
+                                            var temp = angular.copy(v.GrupoAsingado__r.records);
+                                            v.GrupoAsingado__r = [];
+                                            v.GrupoAsingado__r.push(temp);
+                                        } else {
+                                            v.GrupoAsingado__r = angular.copy(v.GrupoAsingado__r.records);
+                                        }
+                                    }
+                                    if(v.Oportunidades__r && v.Oportunidades__r != null) {
+                                        if(v.Oportunidades__r.size === '1') {
+                                            var temp = angular.copy(v.Oportunidades__r.records);
+                                            v.Oportunidades__r = [];
+                                            v.Oportunidades__r.push(temp);
+                                        } else {
+                                            v.Oportunidades__r = angular.copy(v.Oportunidades__r.records);
+                                        }
+                                    }
+                                    
+                                    if(v.Montaje__c && v.Montaje__c.length > 0) {
+                                        var Montaje__c = sfUtils.findElement('value', v.Montaje__c, $scope.base.obj.Grupo__c.k.Montaje__c.values);
+                                        if(Montaje__c && Montaje__c.value) {
+                                            v.Montaje__c__o = Montaje__c;
+                                        }
+                                    }
+                                    
+                                    // console.log('AulaAcademico1__c --> '+ v.AulaAcademico1__c);
+                                  
+                                       if(v.AulaAcademico1__c && v.AulaAcademico1__c.length > 0) {
+                                        var AulaAcademico1__c = sfUtils.findElement('value', v.AulaAcademico1__c, $scope.base.obj.Grupo__c.k.AulaAcademico1__c.values);
+                                         console.log('aula --> '+ AulaAcademico1__c);
+                                        if(AulaAcademico1__c  && AulaAcademico1__c.value ) {
+                                            v.AulaAcademico1__c__o = AulaAcademico1__c;
+                                        }
+                                    }
+                                    
+                                    //   if(v.AulaAcademico__c && v.AulaAcademico__c.length > 0) {
+                                    //    var AulaAcademico__c = sfUtils.findElement('Id', v.AulaAcademico__c, $scope.base.aulas[v.OfertaEducativa__r.Plantel__c]);
+                                        
+                                    //    if(AulaAcademico__c  && AulaAcademico__c.Id ) {
+                                    //        v.AulaAcademico__c__o = AulaAcademico__c;
+                                    //    }
+                                    //}
+                                    
+                                    periods[v.OfertaEducativa__r.Periodo__c].groups.push({
+                                        Id: v.Id, 
+                                        Name: v.Name, 
+                                        Estatus__c: v.Estatus__c,
+                                        Estatus__c__o: v.Estatus__c__o,
+                                        AulaAsignada__c: v.AulaAsignada__c,
+                                        Turno__c: v.Turno__c,
+                                        Turno__c__o : v.Turno__c__o,
+                                        HoraEntrada__c: v.HoraEntrada__c,
+                                        HoraEntrada__c__o: v.HoraEntrada__c__o,
+                                        HoraSalida__c: v.HoraSalida__c,
+                                        HoraSalida__c__o: v.HoraSalida__c__o,
+                                        Dia__c: v.Dia__c,
+                                        FechaApertura__c: v.FechaApertura__c,
+                                        FechaInicioClases__c: v.FechaInicioClases__c,
+                                        CondicionanteGrupo__c: parseInt(v.CondicionanteGrupo__c),
+                                        Sede__c: v.Sede__c,
+                                        Periodicidad__c: v.Periodicidad__c,
+                                        Activo__c: v.Activo__c,
+                                        Cupo__c: v.Cupo__c != null ? parseInt(v.Cupo__c) : '',
+                                        Inscritos__c: v.Inscritos__c != null ? parseInt(v.Inscritos__c) : '',
+                                        Validados__c: v.Inscritos__c != null ? parseInt(v.Inscritos__c): '',
+                                        OfertaEducativa__c: v.OfertaEducativa__r.Id, 
+                                        Modalidad__c: v.OfertaEducativa__r.Modalidad__r.Name,
+                                        Plantel__c: v.OfertaEducativa__r.Plantel__r.Name,
+                                        Plantel__c__i: v.OfertaEducativa__r.Plantel__r.Id,
+                                        Nivel__c: v.OfertaEducativa__r.Nivel__r.Name,
+                                        Programa__c: v.OfertaEducativa__r.Programa__r.Name,
+                                        Programa__c__i: v.OfertaEducativa__r.Programa__r.Id,
+                                        GrupoAsingado__r : v.GrupoAsingado__r || [],
+                                        Oportunidades__r: v.Oportunidades__r || [],
+                                        Docente__c: v.Docente__c,
+                                        Docente__c__t: v.Docente__r != null ? v.Docente__r.Name : '',
+                                        Materia__c: v.Materia__c,
+                                        Materia__c__t: v.Materia__r != null ? v.Materia__r.Name : '',
+                                        Montaje__c: v.Montaje__c,
+                                        Montaje__c__o: v.Montaje__c__o,
+                                        //   AulaAcademico__c: v.AulaAcademico__c,
+                                        //AulaAcademico__c__o: v.AulaAcademico__c__o
+                                      
+                                          AulaAcademico1__c: v.AulaAcademico1__c,
+                                        AulaAcademico1__c__o: v.AulaAcademico1__c__o
+                                        //CupoAcademico__c__o: v.CupoAcademico__c
+                                    });
+                                     
+                                });
+                                
+                                angular.forEach(Object.keys(periods), function(p, key){
+                                    $scope.base.periods.instances.push(periods[p]);
+                                });
+                                $scope.base.periods.selected = $scope.base.periods.instances[0];
+                                
+                                clearInterval(myvar);
+                                //  console.log('limpia my var-> ');
+                            }
+                            ajusta();
+                        }
+                    }
+                }
+                $scope.base.loading = false;
+                $scope.$apply();
+            });
+        }
+    };
+    */
+    
+    $scope.$watch('[base.groups.pag.sea, base.periods.selected, base.groups.pag.ipp, base.groups.showHistory]', function (value) {
+        $scope.paginationGroups($scope.base.groups.pag.sea);
+    }, true);
+    
+    $scope.getAulas = function(idsPlantel) {
+        
+        if(idsPlantel && angular.isObject(idsPlantel)) {
+            var arr = Object.keys(idsPlantel);
+            var ids = '';
+            angular.forEach(arr, function(v, k) {
+                if(ids.length > 0) {
+                    ids += ', ';
+                }
+                ids += '\'' + v + '\'';
+            });
+            var query = 'SELECT Id, Cupo__c, Name, Plantel__c FROM Aula__c WHERE Plantel__c IN(' + ids +')';
+            ctcUtils.retrieve(query, function(err, res) {
+                //      console.log('\n\n in getAulas');
+                if(!err) {
+                    angular.forEach(res, function(v, k) {
+                        var plantel = [];
+                        if($scope.base.aulas[v.Plantel__c]) {
+                            plantel = $scope.base.aulas[v.Plantel__c];
+                        }
+                        plantel.push(v);
+                        $scope.base.aulas[v.Plantel__c] = plantel;
+                        nuevoIds=plantel;
+                    });
+                    
+                    contador ++;
+                    console.log('contador '+ contador);
+                }
+            });
+        }
+    };
+    
+    $scope.paginationGroups = function(value) {
+        if($scope.base.periods && $scope.base.periods.selected && $scope.base.periods.selected && $scope.base.periods.selected.groups && $scope.base.periods.selected.groups.length > 0) {
+            
+            var add = [];
+            angular.forEach($scope.base.periods.selected.groups, function(v, k) {
+                if($scope.base.groups.showHistory && v.Docente__c && v.Docente__c.length > 0 && v.Materia__c && v.Materia__c.length > 0) {
+                    add.push(v);
+                } else if(!$scope.base.groups.showHistory && (!v.hasOwnProperty('Docente__c') || v.Docente__c == undefined || v.Materia__c == undefined ||!v.hasOwnProperty('Materia__c'))) {
+                    add.push(v);
+                }
+            });
+            
+            $scope.base.groups.filtered = filterFilter(add, value);
+            //$scope.base.groups.filtered = filterFilter($scope.base.periods.selected.groups, value);
+            
+            $scope.base.groups.pag.tit = $scope.base.groups.filtered.length;
+            $scope.base.groups.pag.tpa = Math.ceil($scope.base.groups.pag.tit / $scope.base.groups.pag.ipp);
+            if($scope.base.groups.pag.cpa > $scope.base.groups.pag.tpa) {
+                $scope.base.groups.pag.cpa = 1;
+            }
+        }
+    };
+    $scope.saveChanges = function() {
+        $scope.base.groups.saving = true;
+        $scope.base.errors = [];
+        $scope.base.success = [];
+        if($scope.base.periods.selected && $scope.base.periods.selected.groups && $scope.base.periods.selected.groups.length > 0) {
+            var payload = [];
+            //angular.forEach($scope.base.periods.selected.groups, function(g, key) {
+            angular.forEach($scope.base.groups.filtered, function(g, key) {
+                //var obj = new sforce.SObject('Grupo__c');
+                var obj = {};
+                obj.Id = g.Id;
+                if(g.hasOwnProperty('Docente__c__o')) {
+                    obj.Docente__c = g.Docente__c__o != null && g.Docente__c__o.hasOwnProperty('Id') ? g.Docente__c__o.Id : null;
+                }
+                if(g.hasOwnProperty('Materia__c__o')) {
+                    obj.Materia__c = g.Materia__c__o != null && g.Materia__c__o.hasOwnProperty('Id') ? g.Materia__c__o.Id : null;
+                }
+                obj.AperturaAcademico__c = obj.Docente__c != null && obj.Materia__c != null ? true : false;
+                //obj.Activo__c = obj.Docente__c != null && obj.Materia__c != null ? 'Activo' : 'Inactivo';
+                obj.Activo__c = 'Activo';
+                obj.Montaje__c = g.Montaje__c__o ? g.Montaje__c__o.value : g.Montaje__c;
+                //console.log('a1----> '+ obj.Docente__c);
+                //console.log('a2----> '+ g.AulaAcademico1__c__o);
+                //console.log('a3----> '+ g.AulaAcademico1__c);
+                obj.AulaAcademico1__c = g.AulaAcademico1__c__o ? g.AulaAcademico1__c__o.value : g.AulaAcademico1__c;
+                
+                //  obj.AulaAcademico__c = g.AulaAcademico__c__o ? g.AulaAcademico__c__o.Id : g.AulaAcademico__c;
+                obj.CupoAcademico__c = g.CupoAcademico__c;
+                
+                payload.push(obj);
+            });
+            
+            ctcUtils.upsert('Grupo__c', payload, function(err, res) {
+                
+                $scope.base.groups.saving = false;
+                if(err) {
+                    $scope.base.errors.push("Ocurrió un error al procesar su petición, ");
+                } else {
+                    $scope.base.success.push("Grupos actualizados correctamente");
+                }
+                $scope.base.Timer = $interval(function () {
+                    if($scope.base.close) {
+                        $scope.base.errors = [];
+                        $scope.base.success = [];
+                    }
+                    $interval.cancel($scope.base.Timer);
+                }, $scope.base.delayClose);
+                $scope.$apply();
+            });
+            
+            
+        }
+    };
+    $scope.setFieldSort = function(sortField) {
+        $scope.base.groups.pag.sfi = sortField;
+        $scope.base.groups.pag.rev = !$scope.base.groups.pag.rev;
+    }
+    var isSortedBy = function (fieldName) {return $scope.base.groups.pag.sfi === fieldName; }; 
+    var isSortedAscending = function (fieldName) {return isSortedBy(fieldName) && !$scope.base.groups.pag.rev; }; 
+    var isSortedDescending = function (fieldName) {return isSortedBy(fieldName) && $scope.base.groups.pag.rev; }; 
+    $scope.iconSort = function (fieldName) {return {'fa fa-sort': !isSortedBy(fieldName), 'fa fa-sort-amount-asc fa-fw': isSortedAscending(fieldName), 'fa fa-sort-amount-desc fa-fw': isSortedDescending(fieldName)}; }; 
+    }]);
+    
+    
+    
+    
+    
+    app.directive('ctcAutoComplete', function($filter, $interval, ctcUtils) {
+        return {
+            restrict: 'EA',
+            replace: true,
+            scope: {
+                instance: '=ctcInstance',
+                term: '=ctcTerm',
+                field: '=ctcField',
+                form: '=ctcForm',
+                fields: '=ctcFields'
+            },
+            template: '<div class="sf-autocomplete-holder"><input ng-keypress="verifyKey($event)" ng-disabled="disabled" ng-class="validateClass(form, field.name)" ng-change="findTerm()" ng-blur="hideResults()" ng-model="term" class="form-control"><select ng-model="instance[field.name + \'__o\']" name="{{field.name}" ng-hide="true" ng-required="field.required"/><span class="fa fa-search sf-autocomplete-search"/><div class="sf-autocomplete-dropdown" ng-if="showDropdown"><div ng-if="searching" class="sf-autocomplete-row"><span ng-bind="labelSearching"/></div><div class="sf-autocomplete-row" ng-repeat="result in results" ng-class="{\'sf-autocomplete-selected-row\': $index == currentIndex}" ng-click="setSelected($index)"><span ng-repeat="field in fields" ng-bind="result[field]"/></div></div>',
+            link: function ($scope, elem, attrs) {
+                $scope.searching = false;
+                $scope.labelSearching = $scope.search || 'Buscando...';
+                $scope.currentIndex = 0;
+                $scope.showDropdown = false;
+                $scope.Timer = null;
+                
+                $scope.setSelected = function(index) {
+                    $scope.instance[$scope.field.name + '__o'] = $scope.results[index];
+                    $scope.term = $scope.instance[$scope.field.name + '__o'].Name;
+                };
+                
+                
+                
+                
+                $scope.verifyKey = function($event) {
+                    if($event.keyCode === 13) {
+                        $event.preventDefault();
+                        $event.stopPropagation();
+                    }
+                };
+                $scope.validateClass = function(form, fieldName) {
+                    if(form && fieldName && form[fieldName]) {
+                        return form[fieldName].$valid ? 'ctc-has-success' : 'ctc-has-error';
+                    }
+                };
+                
+                $scope.updateFilter = function(registered, form) {
+                    //console.log('\n\nin updateFilter...' + new Date());
+                    //console.log(registered);
+                    //console.log($scope.instance);
+                    if(registered && form) {
+                        //console.log('in updateFilter ' + new Date());
+                        angular.forEach(registered, function(instance, index) {
+                            angular.forEach(fields, function(field, idx) {
+                                //console.log(form[field+$scope.instanceParent.Id]);
+                                if(form[field+instance.Id]) {
+                                    form[field+instance.Id].$$parseAndValidate();
+                                }
+                            });
+                        });
+                    }
+                }
+                $scope.findTerm = function() {
+                    $scope.searching = true;
+                    $scope.showDropdown = true;
+                    $scope.results = [];
+                    $scope.instance[$scope.field.name + '__o'] = null;
+                    $scope.base = {
+                        Docente__c: {
+                            //get: 'SELECT Id, Name FROM Docente__c WHERE Name LIKE \'%'+$scope.term+'%\' OR ApMaterno__c LIKE \'%'+$scope.term+'%\' OR ApPaterno__c LIKE \'%'+$scope.term+'%\' LIMIT 25'
+                            get: 'SELECT Id, Name FROM Docente__c WHERE Name LIKE \'%'+$scope.term+'%\' LIMIT 20'
+                        },
+                        Materia__c : {
+                            get: 'SELECT Id, Name FROM Materia__c WHERE Name LIKE \'%'+$scope.term+'%\' AND Programa__c=\''+$scope.instance.Programa__c__i+'\' AND Plantel__c=\''+$scope.instance.Plantel__c__i+'\' LIMIT 20'
+                        }
+                    };	
+                    
+                    //console.log('\n\n in findTerm ...');
+                    //console.log($scope);
+                    
+                    //FUNCIONAL
+                    $scope.query = $scope.base[$scope.field.name].get;
+                    if($scope.query && $scope.query.length > 2) {
+                        //sfUtils.retrieve($scope.query, function(res) {
+                        ctcUtils.retrieve($scope.query, function(err, res) {
+                            //console.log('result findTerm ...');
+                            //console.log(res);
+                            $scope.results = res;
+                            if($scope.results.length > 0) {
+                                $scope.showDropdown = true;
+                            }
+                            $scope.$apply();
+                            //console.log($scope);
+                        });
+                    }
+                    
+                    $scope.currentIndex = 0;
+                    $scope.searching = false;
+                    if($scope.results && $scope.results.length < 1) {
+                        $scope.showDropdown = false;
+                    }
+                };
+                $scope.hideResults = function() {
+                    $scope.Timer = $interval(function () {
+                        $scope.showDropdown = false;
+                        $interval.cancel($scope.Timer);
+                    }, 200);
+                };
+                
+                elem.on("keyup", function (event) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    var strLength = $scope.term ? $scope.term.length : 0;
+                    if($scope.results && $scope.results.length>0) {
+                        if(event.which === 40) { 
+                            if(!$scope.showDropdown && $scope.results.length>0) {
+                                $scope.showDropdown = true;
+                            } else {
+                                if (($scope.currentIndex + 1) < $scope.results.length) {
+                                    $scope.currentIndex ++;
+                                } else {
+                                    $scope.currentIndex = 0;
+                                } 
+                            }
+                        } else if(event.which === 38) {
+                            if ($scope.currentIndex >= 1) {
+                                $scope.currentIndex --;
+                            } else {
+                                $scope.currentIndex = ($scope.results.length - 1);
+                            }
+                            event.target.setSelectionRange(strLength, strLength);
+                        } else if(event.which === 13) {
+                            $scope.setSelected($scope.currentIndex);
+                            $scope.showDropdown = false;
+                        } else if(event.which === 27) {
+                            $scope.showDropdown = false;
+                        } else {
+                            $scope.showDropdown = false;
+                        }
+                    } else if(event.which === 38) {
+                        event.target.setSelectionRange(strLength, strLength);
+                    }
+                    $scope.$apply();
+                });
+            }
+        }
+    });
+    app.filter('startFrom', function () {
+        return function (input, start) {
+            if (input) {
+                start = +start;
+                return input.slice(start);
+            }
+            return [];
+        };
+    });
+    
+    
+    app.factory('ctcUtils', function($filter, $interval) {
+        var delay = 300;
+        
+        var describeObject = function(objects, callback) {
+            OFE_OfertaEducativaCtrl.describe(objects, function(result, event) {
+                if(result) {
+                    var metadata = {};
+                    angular.forEach(result, function(v, i) {
+                        var fields = [];
+                        angular.forEach(v.fields, function(field, index) {
+                            var isRequired = (field.createable && !field.nillable && !field.defaultedOnCreate) || !field.custom;
+                            var mdField = {name: field.name, label: field.label, type: field.type, length: field.length, required: isRequired};
+                            if(field.type === 'picklist' || field.type === 'multipicklist' || field.type === 'reference') {
+                                if(field.picklistValues && field.picklistValues.length > 0) {
+                                    var values = [];
+                                    angular.forEach(field.picklistValues, function(it) {
+                                        values.push({label: it.label, value: it.value});
+                                    });
+                                    mdField.values = values;
+                                }
+                                mdField.referenceTo = field.referenceTo
+                            } else if(field.type === 'double' || field.type === 'percent') {
+                                mdField.precision = field.precision;
+                                mdField.scale = field.scale;
+                            }
+                            if(field.hasOwnProperty('inlineHelpText')) {
+                                mdField.helpText = field.inlineHelpText;
+                            }
+                            fields.push(mdField);
+                        });
+                        metadata[v.name] = fields;
+                    });
+                    callback(null, metadata);
+                } else {
+                    callback([event.message], null);
+                }
+            });
+            
+        };
+        var retrieveObject = function(query, callback) {
+            OFE_OfertaEducativaCtrl.query(query, function(result, event) {
+                if(result) {
+                    callback(null, result);
+                } else {
+                    callback([event.message], null);
+                }
+            });
+        };
+        var upsertObjects = function(objType, upserts, callback) {
+            OFE_OfertaEducativaCtrl.upsertObjects(objType, JSON.stringify(upserts), function(result, event) {
+                if(result) {
+                    callback(null, result);
+                } else {
+                    callback([event.message], null);
+                }
+            });
+        };
+        var deleteObjects = function(ids, callback) {
+            /*sforce.connection.deleteIds(ids, {
+	                onSuccess: function(res) {
+	                  callback(res);
+	                },
+	                onFailure: function(res) {
+	                  callback(res);
+	                }
+	              });*/
+        };
+        var parseDate =  function(date) {
+            return $filter('date')(date, 'dd/MM/yyyy');
+        };
+        var findElementInArray = function(field, value, datasource) {
+            var ret = {};
+            if(field && value && datasource) {
+                var res = $filter('filter')(datasource, {[field]: value}, true);
+                if(res && res.length > 0) {
+                    ret = res[0];
+                }
+            }
+            return ret;
+        };
+        var fieldIsValid = function(fieldName, form) {
+            if(!fieldName || !form) {
+                return '';
+            } else {
+                return form[fieldName].$valid ? 'has-success' : 'has-error';
+            }
+        };
+        var createDate = function(strDate) {
+            var date = null;
+            strDate = strDate || '';
+            strDate = strDate.split('/');
+            if(strDate.length > 2) {
+                date = new Date();
+                date.setDate(strDate[0]);
+                date.setMonth(strDate[1]  - 1);
+                date.setFullYear(strDate[2]);
+            }
+            return date;
+        };
+        return {
+            describe: describeObject,
+            retrieve: retrieveObject,
+            upsert: upsertObjects,
+            delete: deleteObjects,
+            parseDate: parseDate,
+            findElement: findElementInArray,
+            fieldIsValid: fieldIsValid,
+            createDate: createDate
+        }
+    });
+    
+    var directives = angular.module('ctc.directives', ['ctc.input.html']);
+    directives.directive('ctcFormGroup',['$q', function($q) {
+        return {
+            scope: {
+                form: '=ctcForm',
+                field: '=ctcField',
+                instance: '=ctcInstance',
+                opts: '=ctcOpts',
+                label: '=ctcLabel'
+            },
+            replace: true,
+            template: '<div class="form-group" ng-class="validateClass(form, field.name)"><div class="col-sm-{{cols.two}}" ><ctc-input ctc-form="form" ctc-field="field" ctc-type="{{field.type}}" ctc-instance="instance" ctc-opts="opts" ctc-label="label"></ctc-input><i class="ctc-error-message" ng-if="form[field.name].$invalid" >{{getErrorMessage(form, field.name)}}</i></div></div> ',
+            
+            link: function($scope, element, attrs, ctrl) {
+                
+                $scope.cols = {one: '4', two: '12'};
+                $scope.fieldTypes = {string: 'string', textarea: 'textarea'};
+                if($scope.field && $scope.field.type === 'percent' || $scope.field.type === 'double' ) {
+                    $scope.field.length = $scope.field.precision;
+                }
+                $scope.errors = {required: 'Requerido', maxlength: 'Máximo ' + $scope.field.length + ' caracteres', number: 'Debe ser numérico', minlength: 'Longitud mínima ' + $scope.field.length + ' caracteres', pattern: 'Formato requerido dd/MM/aaaa'};
+                
+                $scope.validateClass = function(form, fieldName) {
+                    if(form && fieldName && form[fieldName]) {
+                        return form[fieldName].$valid ? 'has-success' : 'has-error';
+                    }
+                };
+                
+                $scope.getErrorMessage = function(form, fieldName) {
+                    var err = '';
+                    if(form && fieldName && form[fieldName]) {
+                        for(key in form[fieldName].$error) {
+                            err += $scope.errors[key];
+                        }
+                    }
+                    return err;
+                }
+            }
+        }
+    }]);
+    directives.directive('ctcLabel', function() {
+        return {
+            restrict: 'E',
+            scope: {
+                field: '=ctcField',
+                value: '=ctcValue',
+                colClass: '=ctcColClass'
+            },
+            templateUrl: 'ctc-label.html',
+            link: function($scope, element, attrs) {
+                $scope.cols = {one: ($scope.colClass && $scope.colClass[0] ? $scope.colClass[0] : '4'), two: ($scope.colClass && $scope.colClass[1] ? $scope.colClass[1] : '8')};
+            }
+        }
+    });
+    directives.directive('ctcInput',['$templateCache', 'sfUtils', function($templateCache, sfUtils) {
+        return {
+            scope: {
+                form: '=ctcForm',
+                field: '=ctcField',
+                instance: '=ctcInstance',
+                opts: '=ctcOpts',
+                label: '=ctcLabel'
+            },
+           
+            replace: true,
+            template: '<ng-include src="getTemplateUrl()"/>',
+            link: function($scope, element, attrs) {
+                if($scope.field && $scope.field.type && $scope.field.type === 'multipicklist') {
+                    $scope.selected = {};
+                }
+                $scope.validateClass = function(form, fieldName) {
+                    if(form && fieldName && form[fieldName]) {
+                        return form[fieldName].$valid ? 'ctc-has-success' : 'ctc-has-error';
+                    }
+                };
+                $scope.getTemplateUrl = function() {
+                    var url = 'ctc.input.html';
+                    var type = $scope.field.type;
+                    
+                    if (type === 'textarea') {
+                        url = 'ctc.textarea.html';
+                    } else if(type === 'double') {
+                        url = 'ctc.number.html';
+                    } else if(type === 'percent') {
+                        url = 'ctc.percent.html';
+                    } else if(type === 'picklist' || type === 'reference') {
+                        url = 'ctc.select.html';
+                    } else if(type === 'boolean') {
+                        url = 'ctc.checkbox.html';
+                    } else if(type === 'date') {
+                        url = 'ctc.datebox.html';
+                    } else if(type == 'multipicklist') {
+                        url = 'ctc.multipicklist.html';
+                    }
+                    return url;
+                };
+                $scope.getOptions = function() {
+                    var field = $scope.field;
+                    $scope.selected = {};
+                    var selected = $scope.instance[field.name];
+                    
+                    angular.forEach($scope.opts, function(instance, key){instance.isChecked = false; });
+                    
+                    if(selected && selected.length > 0 && $scope.opts) {
+                        var opts = selected.split(';');
+                        angular.forEach(opts, function(opt, key) {
+                            if(opt && opt.length > 0) {
+                                var instanceOpts = sfUtils.findElement('value', opt, $scope.opts);
+                                if(instanceOpts) {
+                                    instanceOpts.isChecked = true;
+                                    $scope.field.requiredM = false;
+                                }
+                            }
+                        });
+                    }
+                };
+                $scope.moveOptions = function(source) {
+                    if(source) {
+                        angular.forEach($scope.selected[source], function(instance, index) {
+                            var instanceOpts = sfUtils.findElement('value', instance.value, $scope.opts);
+                            if(instanceOpts) {
+                                instanceOpts.isChecked = source === 'Base';
+                            }
+                        });
+                    }
+                    var required = true;
+                    angular.forEach($scope.opts, function(value, key){
+                        if(required && value.isChecked) {
+                            required = false;
+                        }
+                    });
+                    
+                    $scope.field.requiredM = required;
+                    $scope.selected = {};
+                };
+            }
+        }
+    }]);
+    directives.directive('ctcFormatNumber', function () {
+        return {
+            require: 'ngModel',
+            scope: {
+                field: '=sfField'
+            },
+            link: function ($scope, element, attr, ngModelCtrl) {
+                function fromUser(text) {
+                    if (text) {
+                        var field = $scope.field;
+                        var scale = field && $scope.field.scale ? $scope.field.scale : 0;
+                        var transformedInput = text;
+                        if(scale > 0) {
+                            transformedInput = text.replace(/[^0-9\.]/g, '');
+                            var decimalCheck = transformedInput.split('.');
+                            if(!angular.isUndefined(decimalCheck[1])) {
+                                decimalCheck[1] = decimalCheck[1].slice(0, scale);
+                                transformedInput = decimalCheck[0] + '.' + decimalCheck[1];
+                            }
+                        } else {
+                            transformedInput = text.replace(/[^0-9]/g, '');
+                        }
+                        if(field.precision && transformedInput.length > field.precision) {
+                            transformedInput = transformedInput.substring(0, field.precision);
+                        }
+                        if (transformedInput !== text) {
+                            ngModelCtrl.$setViewValue(transformedInput);
+                            ngModelCtrl.$render();
+                        }
+                        return transformedInput;
+                    }
+                    return '';
+                }            
+                ngModelCtrl.$parsers.push(fromUser);
+            }
+        };
+    })
+    angular.module("ctc.input.html", []).run(["$templateCache", function($templateCache) {
+        
+        $templateCache.put("ctc.input.html",
+                           '<input id="{{fiel d.name}}" ng-class="validateClass(form, field.name)" type="text" ng-model="instance[field.name]" class="form-control" name="{{field.name}}" ng-required="field.required" ng-maxlength="field.length">');
+        
+        $templateCache.put("ctc.number.html",
+                           '<input sf-field="field" ng-class="validateClass(form, field.name + instance.$$hashKey)" type="number" ng-model="instance[field.name]" class="form-control" name="{{field.name+instance.$$hashKey}}" ng-required="field.required"  ng-maxlength="field.length"/>');
+        
+        $templateCache.put("ctc.percent.html",
+                           '<input ctc-format-number sf-field="field" ng-class="validateClass(form, field.name + instance.$$hashKey)" type="text" ng-model="instance[field.name]" class="form-control" name="{{field.name+instance.$$hashKey}}" ng-required="field.required" ng-maxlength="field.length"/>');
+        
+        
+        $templateCache.put("ctc.textarea.html",
+                           '<textarea ng-class="validateClass(form, field.name)" type="text" ng-model="instance[field.name]" class="form-control" name="{{field.name}}" ng-required="field.required" ng-maxlength="field.length"/>');
+        
+        $templateCache.put("ctc.select.html", '<select ng-class="validateClass(form, field.name)" class="form-control" ng-model="instance[field.name+\'__o\']" name="{{field.name}}" ng-required="field.required" ng-options="opt as opt[label] for opt in opts"><option ng-if="opts.length > 0 && !field.hideDefault" value="" selected>-- Ninguno --</option></select>');
+        
+        $templateCache.put("ctc.checkbox.html", '<input type="checkbox" ng-model="instance[field.name]" name="{{field.name}}">');
+        
+        $templateCache.put("ctc.datebox.html", '<input datepicker="instance[field.name]" ng-pattern="/^((\\d{2})\\/(\\d{2})\\/(\\d{4}))$/" ng-minlength="10" ng-maxlength="10" maxlength="10" ng-required="field.required" placeholder="dd/MM/aaaa" name="{{field.name}}" class="form-control" ng-model="instance[field.name]"></input>');
+        
+        $templateCache.put("ctc.multipicklist.html_old", '<div class="row"><div class="col-sm-6 text-left"><a ng-click="moveOptions(multiple[field.name+\'_Base\'], multiple[field.name+\'_Selected\'])" ng-class="{\'disabled\': multiple[field.name+\'_Base\'].length <= 0}"><span class="fa-stack"> <i class="fa fa-circle fa-stack-2x"></i> <i class="fa fa-arrow-right fa-stack-1x fa-inverse"></i> </span></a> <select name="{{field.name}}" ng-required="{{field.required}}" ng-init="getOptions()" multiple="true" class="form-control" ng-options="opt as opt[label] for opt in multiple[field.name+\'_Base\']" ng-model="selected.Base"> </select></div><div class="col-sm-6 text-right"><a ng-click="moveOptions(multiple[field.name+\'_Selected\'], multiple[field.name+\'_Base\'])" ng-class="{\'disabled\': multiple[field.name+\'_Selected\'].length > 0}"><span class="fa-stack"> <i class="fa fa-circle fa-stack-2x"></i> <i class="fa fa-arrow-left fa-stack-1x fa-inverse"></i> </span></a><select name="{{field.name}}" ng-required="{{field.required}}" multiple="true" class="form-control" ng-options="opt as opt[label] for opt in multiple[field.name+\'_Selected\']" ng-model="selected.Selected"> </select></div></div>');
+    }]);
+    </script>
+</apex:component>

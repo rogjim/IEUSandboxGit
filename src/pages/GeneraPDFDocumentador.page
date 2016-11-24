@@ -1,0 +1,66 @@
+<apex:page standardStylesheets="false" sidebar="false" renderAs="pdf" controller="GeneraPDFDocumentadorController"   action="{!ListaDocumentador}" applyBodyTag="false" applyHtmlTag="false" showHeader="false"  readOnly="true" >
+    
+    <head>
+        
+        <style type="text/css"> 
+            @page{ 
+            size:A4 portrait; 
+            @bottom-right { 
+            content: "Página " counter(page) " de " counter(pages); 
+            font-family: 'Arial'; 
+            font-size:12px; 
+            } 
+            } 
+            
+            
+            
+        </style>
+        
+        <style>
+            .odd { 
+            background-color: #FCF7F7;
+            }
+            .even {
+            background-color: #E3DCDB;
+            }
+            .headerStyle {        
+            font-size:12px;      
+            color:black;             
+            backgroundcolor:red;   
+            font-family: 'Arial'; 
+            }
+        </style>
+        
+    </head>
+    
+    <apex:image url="{!$Resource.EncabezadoDocumentador}" width="100%" height="100%"/>
+
+    
+    <apex:pageBlock rendered="true"  id="docu">
+        
+        <apex:pageBlockSection title=" " columns="1" collapsible="true" >
+        
+     <!--   <apex:pageBlockSectionItem dataStyle="text-align:center; width: 100%; max-width: 100%; font-family: Arial Unicode MS; ">
+              <apex:outputLabel value="Reporte de Documentos"/>
+        </apex:pageBlockSectionItem>
+        -->
+        
+        <apex:pageMessages id="theMessages" />
+        <apex:pageBlockTable rowClasses="even,odd" headerClass="headerStyle"  value="{!documentadorAux}" style="width:100%" columns="5" var="doc" id="listaDocumentos"      border="1"
+                             cellspacing="1" cellpadding="1" align="center" rendered="true"    >
+            
+            <apex:column headerValue="Nombre"  headerClass="TableTitle"  value="{!doc.Name}" style="font-family: Arial Unicode MS; font-size: 10px;text-align: left; width: 10px; height: 20px; word-wrap: break-word;" >
+              <!--  <apex:outputLink value="{!$Site.Prefix}/{!doc.IdComponente__c}">{!doc.Name}</apex:outputLink> -->
+            </apex:column>
+            <apex:column headerValue="Tipo" headerClass="TableTitle" value="{!doc.Tipo__c}" style="font-family: Arial Unicode MS; font-size: 10px;text-align: left; width: 10px; height: 20px; word-wrap: break-word;" />
+            <apex:column headerValue="Fecha de Creación" value="{!doc.FechaInicio__c}"  style="font-family: Arial Unicode MS; font-size: 10px;text-align: left; width: 10px; height: 20px; word-wrap: break-word;"/ >
+                <apex:column headerValue="Fecha de Última Modificación" value="{!doc.FechaModif__c}"  style="font-family: Arial Unicode MS; font-size: 10px;text-align: left; width: 10px; height: 20px; word-wrap: break-word;" />
+               <apex:column headerValue="Observaciones" value="{!doc.Observacion__c}" style="font-family: Arial Unicode MS; font-size: 8px;text-align: left; width: 10px; height: 20px; word-wrap: break-word;" />
+                
+            </apex:pageBlockTable>
+        </apex:pageBlockSection>
+        
+        
+    </apex:pageBlock> 
+    
+</apex:page>

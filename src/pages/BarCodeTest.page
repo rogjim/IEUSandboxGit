@@ -1,0 +1,3 @@
+<apex:page showHeader="false" sidebar="false" showChat="false">
+	<c:BarCode cadena="{!$CurrentPage.parameters.cadena}"/>
+</apex:page>

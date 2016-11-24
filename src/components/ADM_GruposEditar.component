@@ -1,0 +1,669 @@
+<apex:component >
+    
+   
+    <div class="modal fade" tabindex="-1" role="dialog" id="admGroupEditCtrl" data-backdrop="static" data-keyboard="false" ng-controller="admGroupEditCtrl">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title text-center">
+                        <span class="fa fa-users fa-fw"></span>
+                        <span ng-bind="base.group.message"/>
+                    </h4>
+                </div>
+                <div class="modal-body form-horizontal" ng-if="base.group.editing.onlyView">
+                    <div class="row">
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.Activo__c" ctc-value="base.group.editing.Activo__c" ctc-col-class="[4,8]"></ctc-label>
+                        </div>
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.AulaAsignada__c" ctc-value="base.group.editing.AulaAsignada__c__o.Name" ctc-col-class="[4,8]"></ctc-label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.Turno__c" ctc-value="base.group.editing.Turno__c__o.value" ctc-col-class="[4,8]"></ctc-label>
+                        </div>
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.HoraEntrada__c" ctc-value="base.group.editing.HoraEntrada__c" ctc-col-class="[4,8]"></ctc-label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.Dia__c" ctc-value="base.group.editing.Dia__c" ctc-col-class="[4,8]"></ctc-label>
+                        </div>
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.HoraSalida__c" ctc-value="base.group.editing.HoraSalida__c__o.value" ctc-col-class="[4,8]"></ctc-label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.FechaApertura__c" ctc-value="base.group.editing.FechaApertura__c" ctc-col-class="[4,8]"></ctc-label>
+                        </div>
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.CondicionanteGrupo__c" ctc-value="base.group.editing.CondicionanteGrupo__c" ctc-col-class="[4,8]" ></ctc-label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.FechaInicioClases__c" ctc-value="base.group.editing.FechaInicioClases__c" ctc-col-class="[4,8]"></ctc-label>
+                        </div>
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k"   ng-model="admGroupEditCtrl">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.Cupo__c" ctc-value="base.group.editing.Cupo__c" ctc-col-class="[4,8]"   ></ctc-label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.Sede__c" ctc-value="base.group.editing.Sede__c__o.Name" ctc-col-class="[4,8]"></ctc-label>
+                        </div>
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.Periodicidad__c" ctc-value="base.group.editing.Periodicidad__c__o.Name" ctc-col-class="[4,8]"></ctc-label>
+                        </div>
+                    </div>
+                  <!--  <div class="row">
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.AulaAcademico__c 	 " ctc-value="base.group.editing.AulaAcademico__c__o.Name" ctc-col-class="[4,8]"></ctc-label>
+                        </div>
+                        <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.CupoAcademico__c" ctc-value="base.group.editing.CupoAcademico__c__o.Name" ctc-col-class="[4,8]"></ctc-label>
+                        </div>
+                    </div>-->
+                </div>
+                <div class="modal-footer" ng-if="base.group.editing.onlyView">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                </div>
+                
+                
+                <form class="form-horizontal" name="formEditGroup" novalidate="" ng-submit="saveGroup()" ng-if="!base.group.editing.onlyView">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                                <ctc-label ctc-field="base.obj.Grupo__c.k.Activo__c" ctc-value="base.group.editing.Activo__c" ctc-col-class="[4,8]"></ctc-label>
+                            </div>
+                            <div class="col-sm-6" ng-if="base.obj.Grupo__c.k && base.catalog.Aula__c.instances.length>0">
+                                <ctc-form-group ctc-form="formEditGroup" ctc-field="base.obj.Grupo__c.k.AulaAsignada__c" ctc-instance="base.group.editing" ctc-opts="base.catalog.Aula__c.instances" ctc-label="'Name'"></ctc-form-group>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                                <ctc-form-group ctc-field="base.obj.Grupo__c.k.Turno__c" ctc-opts="base.obj.Grupo__c.k.Turno__c.values" ctc-label="'label'" ctc-instance="base.group.editing" ctc-form="formEditGroup"></ctc-form-group>
+                            </div>
+                            <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                                <ctc-form-group ctc-field="base.obj.Grupo__c.k.HoraEntrada__c" ctc-opts="base.obj.Grupo__c.k.HoraEntrada__c.values" ctc-label="'label'" ctc-instance="base.group.editing" ctc-form="formEditGroup" ctc-on-change="setHoraSalida"></ctc-form-group>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                                <div class="form-group" ng-class="isValid()">
+                                    <label class="control-label col-sm-4">{{base.obj.Grupo__c.k.Dia__c.label}} *</label>
+                                    <div class="col-sm-8">
+                                        <ul class="list-inline">
+                                            <li ng-repeat="day in base.obj.Grupo__c.k.Dia__c.values">
+                                                <div class="checkbox"> 
+                                                    <label>
+                                                        <input type="checkbox" ng-model="day.isCheck" ng-change="hasDays()" name="{{base.obj.Grupo__c.k.Dia__c.name+'CH'}}" ng-required="!base.group.hasDays"></input> {{day.label}}
+                                                </label>
+                                            </div>
+                                    </li>
+                                </ul>	
+                                <i class="help-block ctc-days" ng-show="formEditGroup.{{base.obj.Grupo__c.k.Dia__c.name+'CH'}}.$invalid">Campo requerido</i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                        <ctc-form-group ctc-field="base.obj.Grupo__c.k.HoraSalida__c" ctc-opts="base.obj.Grupo__c.k.HoraSalida__c__f" ctc-label="'label'" ctc-instance="base.group.editing" ctc-form="formEditGroup"></ctc-form-group>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                      <!--  <ctc-form-group ctc-field="base.obj.Grupo__c.k.FechaApertura__c" ctc-instance="base.group.editing" ctc-form="formEditGroup"></ctc-form-group>-->
+                   
+                          
+                            <ctc-label ctc-field="base.obj.Grupo__c.k.FechaApertura__c" ctc-value="base.group.editing.FechaApertura__c" ctc-col-class="[4,8]"></ctc-label>
+                  
+                    </div>
+                    <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                        <ctc-form-group ctc-field="base.obj.Grupo__c.k.CondicionanteGrupo__c" ctc-instance="base.group.editing" ctc-form="formEditGroup"></ctc-form-group>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                        <ctc-form-group ctc-field="base.obj.Grupo__c.k.FechaInicioClases__c" ctc-instance="base.group.editing" ctc-form="formEditGroup" ctc-on-change="validarFecha"></ctc-form-group>
+                    </div>
+                    <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">  
+                        <div class="form-group" >
+                            <label class="control-label col-sm-4"   ><font color="#3c763d">Cupo</font> </label>
+                            <div class="col-sm-8">
+                                <input    name="numero" ng-model="base.group.editing.Cupo__c" only-number="-" ng-required="true" ng-maxlength="16" class="form-control {{ base.group.editing.Cupo__c}}" ng-touched =" base.group.editing.Cupo__c"/>
+                                <span class="help-text" ng-if="formEditGroup.numero.$error.required"> El Campo es Requerido </span>
+                                <span class="help-text" ng-if="formEditGroup.numero.$error.maxlength"> Máximo 16 caracteres </span>
+                                
+                            </div>
+                        </div> 
+                    </div> 
+                </div>
+                
+                <div class="row">
+                    <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                        <ctc-form-group ctc-field="base.obj.Grupo__c.k.Sede__c" ctc-opts="base.catalog.Sede__c.instances" ctc-label="'Name'" ctc-instance="base.group.editing" ctc-form="formEditGroup"></ctc-form-group>
+                    </div>
+                    <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                        <ctc-form-group ctc-field="base.obj.Grupo__c.k.Periodicidad__c" ctc-opts="base.catalog.Periodicity__c.instances" ctc-label="'Name'" ctc-instance="base.group.editing" ctc-form="formEditGroup"></ctc-form-group>
+                    </div>
+                </div>
+                
+           <!--     <div class="row">
+                    <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">
+                        <ctc-form-group ctc-field="base.obj.Grupo__c.k.AulaAcademico__c" ctc-opts="base.catalog.AulaAcademico__c.instances" ctc-label="'Name'" ctc-instance="base.group.editing" ctc-form="formEditGroup"></ctc-form-group>
+                    </div>
+                    <div class="col-sm-6" ng-if="base.obj.Grupo__c.k">  
+                        <div class="form-group" >
+                            <label class="control-label col-sm-4"   ><font color="#3c763d">Cupo Académico</font> </label>
+                            <div class="col-sm-8">
+                                <input    name="numeros" ng-model="base.group.editing.CupoAcademico__c" only-number="-" ng-required="false" ng-maxlength="16" class="form-control {{ base.group.editing.CupoAcademico__c}}" ng-touched =" base.group.editing.CupoAcademico__c"/>
+                                
+                            </div>
+                        </div> 
+                    </div> 
+                </div>
+             -->   
+                
+                
+                <div class="row" >
+                    <div class="col-sm-6 col-sm-offset-6 text-right" ng-if="base.errors.length>0">
+                        <div class="alert alert-danger alert-dismissible fade in">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <ul class="list-unstyled">
+                                <li ng-repeat="err in base.errors"><span ng-bind="err"/></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-sm-offset-6 text-right" ng-if="base.success.length>0">
+                        <div class="alert alert-success alert-dismissible fade in">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <ul class="list-unstyled">
+                                <li ng-repeat="msg in base.success"><span ng-bind="msg"/></li>
+                               <!-- <li><span ng-bind="base.success"/></li>-->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button ng-disabled="formEditGroup.$invalid || base.group.saving" type="submit" class="btn btn-success">
+                    <span class="fa fa-spinner fa-pulse" ng-if="base.group.saving"></span>
+                    <span class="fa fa-save fa-fw"></span>Guardar
+                </button>
+                <button ng-click="base.group.duplicate = true" ng-disabled="formEditGroup.$invalid || base.group.saving" type="submit" class="btn btn-primary">
+                    <span class="fa fa-spinner fa-pulse" ng-if="base.group.saving"></span>
+                    <span class="fa fa-save fa-fw"></span>Guardar y duplicar
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+            </div>
+        </form>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script type="text/javascript">
+var app = angular.module('appIEU');
+app.controller('admGroupEditCtrl', ['$scope','$timeout','$interval', 'sfUtils', function($scope,$timeout, $interval, sfUtils) {
+    $scope.sfUtils = sfUtils;
+    $scope.counter = 0;
+    $scope.base = {
+        describe: ['Aula__c', 'Sede__c'],
+        obj: {},
+        group: {
+            editing: {},
+            hasDays: false,
+            saving: false,
+            duplicate: false,
+            get: 'SELECT Id,Name FROM Grupo__c WHERE OfertaEducativa__c',
+            groups: []
+        },
+        message: '',
+        catalog: {
+            Sede__c: {
+                get: 'SELECT Id, Name, Clave__c, Nomenclatura__c FROM Sede__c',
+                instances: []
+            },
+            Aula__c: {
+                get: 'SELECT Id, Name FROM Aula__c ORDER BY Name ASC  ',
+                // get: 'SELECT Id, Name FROM Aula__c Where Plantel__c=\''+ group.Plantel__c__Id + '\' ORDER BY Name ASC',
+                instances: []
+            },
+            Periodicity__c : {
+                get: 'SELECT Id, Name FROM Catalogo__c WHERE TipoCatalogo__c =\'Periodicidad\' ORDER BY Name ASC',
+                instances: []
+            }
+        },
+        period: {},
+        delay: 300,
+        errors: [],
+        success:[],
+        delayClose: 8000,
+        close: true
+    };
+    $scope.describeObjects = function(objs) {
+        if(objs && objs !== null) {
+            var a = objs.length;
+            var b = 0;
+            angular.forEach(objs, function(o, i) {
+                $scope.base.obj[o] = {a: [], k: {}};
+                sfUtils.describe(o, function(res) {
+                    b++;
+                    if(res.faultcode) { delete $scope.base.obj[o]; return console.error(res); }
+                    $scope.base.obj[o].a = res;
+                    angular.forEach($scope.base.obj[o].a, function(f, j){$scope.base.obj[o].k[f.name] = f; });
+                });
+            });
+            $scope.Timer = $interval(function () {
+                if(b === a) {
+                    $interval.cancel($scope.Timer);
+                    //   $scope.listCatalogs();
+                }
+            }, $scope.base.delay);
+        }
+    };
+    
+    $scope.listCatalogs = function() {
+        angular.forEach(Object.keys($scope.base.catalog), function(k, index) {
+            if(k !== 'Sede__c') {
+                if(k == 'Aula__c'){
+                    $scope.base.catalog[k].get= 'SELECT Id, Name , Cupo__c FROM Aula__c Where Plantel__c=\''+ $scope.sfUtils.group.Plantel__c__Id + '\' ORDER BY Name ASC',
+                        
+                        console.log($scope.base.catalog[k].get);
+                    console.log($scope);
+                }
+                sfUtils.retrieve($scope.base.catalog[k].get, function(res) {
+                    $scope.base.catalog[k].instances = res || [];
+                    if(k == 'Aula__c') {
+                        
+                             angular.forEach($scope.base.catalog[k].instances, function(aula, indice) { 
+                            aula.Name=aula.Name+  ' Cupo: ' + parseInt(aula.Cupo__c);
+                            
+                        })    
+                             //  console.log($scope.base.catalog[k].instances ); 
+                        /*    angular.forEach($scope.base.catalog[k].instances, function(aula, indice) { 
+                            aula.Name=aula.Name +  ' Cupo: ' + parseInt(aula.Cupo__c);
+                            
+                        })    
+                        console.log($scope.base.catalog[k].instances );*/
+
+                        /*Aula__c.instances se creó*/
+                        if($scope.base.group.editing.AulaAsignada__c && $scope.base.group.editing.AulaAsignada__c.length > 0) {
+			                var AulaAsignada__c = sfUtils.findElement('Id', $scope.base.group.editing.AulaAsignada__c, $scope.base.catalog.Aula__c.instances);
+			                if(AulaAsignada__c && AulaAsignada__c.Id) {
+			                    $scope.base.group.editing.AulaAsignada__c__o = AulaAsignada__c;
+			                }
+			            }
+
+                    } else if(k == 'Periodicity__c') {/*Periodicity__c.instances se creó*/
+                    	if($scope.base.group.editing.Periodicidad__c && $scope.base.group.editing.Periodicidad__c.length > 0) {
+			                var Periodicidad__c = sfUtils.findElement('Id', $scope.base.group.editing.Periodicidad__c, $scope.base.catalog.Periodicity__c.instances);
+			                 console.log('Periodicidad ->' +Periodicidad__c);
+			                if(Periodicidad__c && Periodicidad__c.Id) {
+			                    $scope.base.group.editing.Periodicidad__c__o = Periodicidad__c;
+			                }
+			            }
+                    }
+                });
+            }
+        });
+    };
+    $scope.listBasedByCampus = function(group) {
+        var query = $scope.base.catalog.Sede__c.get + ' WHERE Plantel__c=\''+ group.Plantel__c__Id + '\' ORDER BY Name ASC';
+        $scope.base.catalog.Sede__c.instances = []
+        sfUtils.retrieve(query, function(res) {
+            //console.log('sedes: ', res)
+            if(res && res.size != '0') {
+                $scope.base.catalog.Sede__c.instances = res || [];
+                
+                if($scope.base.group.editing.Sede__c && $scope.base.group.editing.Sede__c.length > 0) {
+                    var Sede__c = sfUtils.findElement('Id', $scope.base.group.editing.Sede__c, $scope.base.catalog.Sede__c.instances);
+                    if(Sede__c && Sede__c.Id) {
+                        $scope.base.group.editing.Sede__c__o = Sede__c;
+                    }
+                }
+            }
+        });
+    }
+    
+    $scope.describeObjects($scope.base.describe);
+    
+    $scope.saveGroup = function() {
+        
+        $scope.base.group.saving = true;
+        //console.log('\n\n in saveGroup...');
+        console.log('----->'+$scope.base.group.editing);
+        var payload = angular.copy($scope.base.group.editing);
+        var obj = new sforce.SObject('Grupo__c');
+        if(payload.Id) {obj.Id = payload.Id; }
+        if(payload.AulaAsignada__c__o && payload.AulaAsignada__c__o.Id) {obj.AulaAsignada__c = payload.AulaAsignada__c__o.Id; }
+        if(payload.Turno__c__o && payload.Turno__c__o.value) {obj.Turno__c = payload.Turno__c__o.value; }
+        if(payload.HoraEntrada__c__o && payload.HoraEntrada__c__o.value) {obj.HoraEntrada__c = payload.HoraEntrada__c__o.value; }
+        if(payload.HoraSalida__c__o && payload.HoraSalida__c__o.value) {obj.HoraSalida__c = payload.HoraSalida__c__o.value; }
+        if(payload.Sede__c__o && payload.Sede__c__o.Id) {obj.Sede__c = payload.Sede__c__o.Id; }
+       
+        if(payload.Periodicidad__c__o && payload.Periodicidad__c__o.Id) {obj.Periodicidad__c = payload.Periodicidad__c__o.Id; }
+        
+        
+        //obj.FechaApertura__c = sfUtils.createDate(payload.FechaInicioClases__c); 
+        obj.FechaInicioClases__c = sfUtils.createDate(payload.FechaInicioClases__c);
+        obj.CondicionanteGrupo__c = payload.CondicionanteGrupo__c;
+        obj.Cupo__c = payload.Cupo__c;
+        obj.OfertaEducativa__c = payload.OfertaEducativa__c;
+        obj.Grupo__c = payload.OfertaEducativa__c;
+        obj.Estatus__c = payload.Estatus__c;
+        obj.Dia__c = '';
+        
+        angular.forEach($scope.base.obj.Grupo__c.k.Dia__c.values, function(item, key){if(item.isCheck) {if(obj.Dia__c.length>0){obj.Dia__c +=';';} obj.Dia__c += item.value; }});
+        //console.log(obj);
+        if($scope.base.group.duplicate && !payload.Id) {
+            sfUtils.retrieve($scope.base.group.get + '=\''+payload.OfertaEducativa__c+'\' ORDER BY CreatedDate DESC LIMIT 1', function(res) {
+                //console.log('\n\n response retrieve groups by OfertaEducativa__c...');
+                //console.log(res);
+                if(res.faultcode) {
+                    $scope.base.group.saving = false;
+                    $scope.base.errors.push("Ocurrió un error al procesar su petición, " + (res.faultstring ? res.faultstring : ''));
+                } else {
+                    var name = '';
+                    //console.log(res[0].Name);
+                    var temp = res[0];
+                    //temp.Name = '';
+                    if(temp && temp.Name && temp.Name.indexOf('-') !== -1) {
+                        name = temp.Name.substring(temp.Name.indexOf('-') + 1, temp.Name.length);
+                        if(isNaN(parseInt(name))) {
+                            name = 2;
+                        } else {
+                            name = (parseInt(name) + 1);
+                        }
+                    } else {
+                        name = 2;
+                    }
+                    name = temp.Name.substring(0, temp.Name.indexOf('-')) + '-' + name;
+                    //console.log('the new name : ' + name);
+                    //$scope.base.group.editing.Name = name;
+                    obj.Name = name;
+                    $scope.base.group.duplicate = false;
+                    $scope.upsertGroup(obj, obj.Name, true);
+                }
+            });
+        } else {
+            $scope.upsertGroup(obj, payload.Name);
+        }
+    };
+    $scope.upsertGroup = function(obj, name, add) {
+        if($scope.base.Timer) {
+            $interval.cancel($scope.base.Timer);
+        }
+        //console.log('\n\nin upsert Group....');
+        //console.log(obj);
+        $scope.base.errors = [];
+        $scope.base.success = [];
+        sfUtils.upsert([obj], function(res) {
+            //console.log('\n\n response saveChanges...');
+            //console.log(res);
+            $scope.base.group.saving = false;
+            if(res.faultcode) {
+                $scope.base.errors.push("Ocurrió un error al procesar su petición, " + (res.faultstring ? res.faultstring : ''));
+            } else {
+                $scope.base.success.push("Grupo "+name+" actualizado correctamente");
+                var temp = res[0];
+                $scope.base.group.editing.Id = temp ? temp.id : '';
+                $scope.base.group.editing.Name = name;
+                //if(add) {
+                $scope.base.group.editing.Oportunidades__r = [];
+                $scope.base.group.editing.GrupoAsingado__r = [];
+                //$scope.base.group.groups.push($scope.base.group.editing);
+                var _scope = angular.element($('#assingGroupCtrl')).scope()
+                if(_scope && _scope.base && _scope.base.periods && _scope.base.periods.selected && _scope.base.periods.selected.Id) {
+                    _scope.listInstancesGroup(_scope.base.periods.selected);
+                } 
+                var _scope2 = angular.element($('#assingGroupCtrlMin')).scope()
+                if(_scope2 && _scope2.base && _scope2.base.periods && _scope2.base.periods.selected && _scope2.base.periods.selected.Id) {
+                    _scope2.listInstancesGroup(_scope2.base.periods.selected);
+                } 
+
+
+                //angular.element($('#assingGroupCtrlMin')).scope().listInstancesGroup($scope.base.period);
+                //}
+                
+                $scope.base.group.message = 'Editar grupo ' + name;
+                //verify if duplicate group
+                if($scope.base.group.duplicate) {
+                    $scope.base.group.message = 'Duplicar grupo ';
+                    delete $scope.base.group.editing.Id;
+                }
+                  $timeout(function() {
+                      //   $('#admGroupEditCtrl').modal('hide');
+                                  }, 3000);
+                
+            }
+            
+            $scope.base.Timer = $interval(function () {
+                if($scope.base.close) {
+                    $scope.base.errors = [];
+                    $scope.base.success = [];
+                }
+                $interval.cancel($scope.base.Timer);
+            }, $scope.base.delayClose);
+            $scope.$apply();
+        });
+    };
+    
+    
+    $scope.hasDays = function() {
+        var hasDays = false;
+        angular.forEach($scope.base.obj.Grupo__c.k.Dia__c.values, function(item, index){
+            if(item.isCheck && !hasDays) {
+                hasDays = true;
+            }
+        });
+        $scope.base.group.hasDays = hasDays;
+    };
+    $scope.isValid = function() {
+        return sfUtils.fieldIsValid($scope.base.obj.Grupo__c.k.Dia__c.name+'CH', $scope.formEditGroup);
+    };
+    
+    
+    
+    $scope.validaCero = function(cupo) {  
+        var cero=0;
+        var cupoString = cero.toString().length;
+        if(cupo===undefined){ 
+            console.log('es undefined ' ); 
+        } else{
+            console.log('no es undefined '  ); 
+            if(cupo!=null){ 
+                console.log('cupo diferente de nuell '  );  
+                if (isNaN(cupo)==true && cupo!=null){
+                    console.log('Debe contener solo numeros  '+ cupo); 
+                }else{
+                    console.log('es numerico  '+ cupo); 
+                    cupoString = cupo.toString().length;
+                    if(cupo=='0' || cupo <0){
+                        console.log('debe ser mayor a cero.....'+ cupo);  
+                    }else if(cupoString>16){
+                        console.log('no puede ser mayor a 16.....'+cupo );  
+                    }else if( cupo  % 1 != 0){
+                        console.log('debe ser entero.....' +cupo);   
+                    }else{
+                        console.log('correcto....' +cupo); 
+                    } 
+                } 
+            }else{ 
+                console.log('cupo es nuell ' +cupo );  
+            }
+        } 
+    };
+    
+    $scope.$watch('sfUtils.group', function () {
+        //console.log('in watch sfUtils.group...');
+        //console.log($scope.sfUtils.group);
+        $scope.base.errors = [];
+        $scope.base.success = [];
+        $scope.base.group.duplicate = false;
+        $scope.base.group.saving = false;
+        if($scope.sfUtils && $scope.sfUtils.group && $scope.sfUtils.group.Id) {
+            $scope.listCatalogs();
+            $scope.base.group.groups = $scope.sfUtils.groups;
+            $scope.base.obj.Grupo__c = $scope.sfUtils.obj.Grupo__c;
+            $scope.base.obj.Grupo__c.k.Periodicidad__c.required = true
+            $scope.base.group.editing = angular.copy($scope.sfUtils.group);
+            console.log($scope.base.group.editing );
+            $scope.base.period = $scope.sfUtils.period;
+            //$scope.base.group.editing = $scope.sfUtils.group;
+            $scope.base.group.message = 'Editar grupo ' + $scope.base.group.editing.Name;
+            if($scope.base.group.editing.onlyView) {
+                $scope.base.group.message = 'Información del grupo 23' + $scope.base.group.editing.Name;
+            }
+            $scope.listBasedByCampus($scope.base.group.editing);
+            
+            //console.log('\n\n in watch sfUtils.group admGroupEditCtrl');
+            //console.log($scope.base.group.editing);
+            
+            if($scope.base.group.editing.AulaAsignada__c && $scope.base.group.editing.AulaAsignada__c.length > 0) {
+            	console.log($scope.base.catalog.Aula__c.instances);
+                var AulaAsignada__c = sfUtils.findElement('Id', $scope.base.group.editing.AulaAsignada__c, $scope.base.catalog.Aula__c.instances);
+                console.log(AulaAsignada__c);
+                  console.log('aula id ->' +AulaAsignada__c.Id);
+                // console.log('aula2 ->' + base.group.editing.Activo__c);
+                
+               
+                if(AulaAsignada__c && AulaAsignada__c.Id) {
+                    
+                    $scope.base.group.editing.AulaAsignada__c__o = AulaAsignada__c;
+                     console.log('entra a  ->' +AulaAsignada__c);
+                    console.log('entra a 2 ->' + $scope.base.group.editing.AulaAsignada__c__o.Name);
+                }
+            }
+            /*
+            		if($scope.base.group.editing.Sede__c && $scope.base.group.editing.Sede__c.length > 0) {
+            			var Sede__c = sfUtils.findElement('Id', $scope.base.group.editing.Sede__c, $scope.base.catalog.Sede__c.instances);
+            			if(Sede__c && Sede__c.Id) {
+            				$scope.base.group.editing.Sede__c__o = Sede__c;
+            			}
+            		}*/
+            if($scope.base.group.editing.Periodicidad__c && $scope.base.group.editing.Periodicidad__c.length > 0) {
+                var Periodicidad__c = sfUtils.findElement('Id', $scope.base.group.editing.Periodicidad__c, $scope.base.catalog.Periodicity__c.instances);
+                 console.log('Periodicidad ->' +Periodicidad__c);
+                if(Periodicidad__c && Periodicidad__c.Id) {
+                    $scope.base.group.editing.Periodicidad__c__o = Periodicidad__c;
+                }
+            }
+            var dayStr = $scope.base.group.editing.Dia__c;
+            if(dayStr && dayStr.length > 0) {
+                var length = $scope.base.obj.Grupo__c.k.Dia__c.values.length;
+                angular.forEach($scope.base.obj.Grupo__c.k.Dia__c.values, function(value, key){
+                    if(dayStr.indexOf(value.value) !== -1) {
+                        value.isCheck = true;
+                    } else {
+                        delete value.isCheck;
+                    }
+                    if(key === (length - 1)) {
+                        $scope.hasDays();
+                    }
+                });
+            }
+            
+            if($scope.base.group.editing.HoraEntrada__c && $scope.base.group.editing.HoraEntrada__c.length > 0) {
+                var HoraEntrada__c = sfUtils.findElement('value', $scope.base.group.editing.HoraEntrada__c, $scope.base.obj.Grupo__c.k.HoraEntrada__c.values);
+                if(HoraEntrada__c && HoraEntrada__c.value) {
+                    $scope.base.group.editing.HoraEntrada__c__o = HoraEntrada__c;
+                }
+            }
+            if($scope.base.group.editing.HoraSalida__c && $scope.base.group.editing.HoraSalida__c.length > 0) {
+
+                $scope.setHoraSalida({value: $scope.base.group.editing.HoraEntrada__c})
+
+                //var HoraSalida__c = sfUtils.findElement('value', $scope.base.group.editing.HoraSalida__c, $scope.base.obj.Grupo__c.k.HoraSalida__c.values);
+                var HoraSalida__c = sfUtils.findElement('value', $scope.base.group.editing.HoraSalida__c, $scope.base.obj.Grupo__c.k.HoraSalida__c__f);
+
+                if(HoraSalida__c && HoraSalida__c.value) {
+                    $scope.base.group.editing.HoraSalida__c__o = HoraSalida__c;
+                }
+            }
+            if($scope.base.group.editing.Turno__c && $scope.base.group.editing.Turno__c.length > 0) {
+                var Turno__c = sfUtils.findElement('value', $scope.base.group.editing.Turno__c, $scope.base.obj.Grupo__c.k.Turno__c.values);
+                if(Turno__c && Turno__c.value) {
+                    $scope.base.group.editing.Turno__c__o = Turno__c;
+                }
+            }
+        }
+        //console.log($scope.base);
+    }, true);
+
+    $scope.setHoraSalida = function(model, field, form) {
+        //console.log('arguments setHoraSalida: ', arguments)
+        $scope.base.obj.Grupo__c.k.HoraSalida__c__f = []
+        if(model && model.value) {
+          //console.log('values: ', $scope.base.obj.Grupo__c.k.HoraSalida__c.values)
+          var entrada = model.value.replace(/[^0-9]/g, '')
+          angular.forEach($scope.base.obj.Grupo__c.k.HoraSalida__c.values, function(v, k) {
+              var salida = v.value.replace(/[^0-9]/g, '')
+              if(parseInt(salida) > parseInt(entrada)) {
+                  $scope.base.obj.Grupo__c.k.HoraSalida__c__f.push(v)
+              }
+          })
+        }
+    }
+
+    $scope.validarFecha = function(date, field, form) {
+        console.log('validarFecha: ', arguments)
+        if(form && field && form[field.name] && date && date.length > 0 && date.split('/').length == 3) {
+            console.log('validar...')
+            var fecha = date.split('/')
+            form[field.name].$setValidity('fecha', fechaValida(fecha[0], fecha[1], fecha[2])) 
+            console.log(form)
+        }
+    }
+
+    function fechaValida(dia, mes, anio) {
+        var anoNum = parseInt(anio, 10)
+        var mesNum = parseInt(mes, 10) - 1
+        var diaNum = parseInt(dia, 10)
+        var fechaAno = new Date(anoNum,1,1)
+        var fechaDate = new Date(anoNum, mesNum, diaNum)
+        return (fechaAno.getFullYear() == fechaDate.getFullYear() && mesNum == fechaDate.getMonth()) ? true : false
+    }
+
+
+}]);
+
+
+app.directive('onlyNumber', ['$compile', function($compile) {
+    return {
+        require: 'ngModel',
+        restrict: 'A',
+        link: function($scope, iElm, iAttrs, ctrl) {
+            
+            
+            var validaEntero = function(value) {
+                var ti = value ? (value+'').replace(/[^\d]/g,'') : '0';
+                if(parseInt(ti) <= 0) {
+                    ti = null;
+                }
+                if(ti != value) {
+                    ctrl.$setViewValue(ti);
+                    ctrl.$render();
+                }
+                return ti;
+            }
+            if(validaEntero && typeof validaEntero == 'function') {
+                ctrl.$parsers.push(validaEntero);//valida cambios usuario
+                ctrl.$formatters.push(validaEntero);//valida cambios de sistema
+            }
+        }
+    };
+}]);
+
+
+</script>
+</apex:component>
