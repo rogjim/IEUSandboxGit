@@ -121,4 +121,5 @@ utils.assignPictureProfileUrl(idUsers, newList);
         paramName=Utils.encodeQueryParam(  paramName, paramVal);
     }
     /*Se quitan los comentarios*/
+    /*Comentario Rogelio*/
 }
